@@ -1,0 +1,10 @@
+h1 Repo
+div(ng-hide="profile.login")
+  a(href="./auth/github") Sign in with GitHub
+div(ng-show="profile.login")
+  img.avatar(ng-src="{{profile.avatar_url}}")
+  p {{profile.name}}
+  h2 Files
+  ul
+    li(ng-repeat="file in repo_files | filter:{type:'blob'}")
+      a(href="#/edit?name={{repo_name}}&branch={{repo_branch}}&path={{file.path}}&sha={{file.sha}}") {{file.path}}

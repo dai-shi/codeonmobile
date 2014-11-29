@@ -1,0 +1,24 @@
+{
+  "name": "CodeOnMobile",
+  "description": "A coding tool on mobile devices targeting GitHub/Codeship/Heroku",
+  "author": "Daishi Kato <daishi@axlight.com>",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "body-parser": "1.5.2",
+    "cookie-parser": "1.3.2",
+    "express": "4.10.4",
+    "express-session": "1.9.2",
+    "github": "0.2.3",
+    "jade": "1.5.0",
+    "passport": "0.2.1",
+    "passport-github": "0.1.5",
+    "socket.io": "1.0.6"
+  },
+  "license": "BSD",
+  "engines": {
+    "node": "0.10.29"
+  }
+}
