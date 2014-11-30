@@ -2,7 +2,7 @@
 .container(ng-hide="profile.login")
   a(href="./auth/github") Sign in with GitHub
 .container(ng-show="profile.login")
-  .header
+  .header-area
     img.avatar.pull-right(ng-src="{{profile.avatar_url}}")
     p.name.pull-right {{profile.name}}
     h3.pull-left Files

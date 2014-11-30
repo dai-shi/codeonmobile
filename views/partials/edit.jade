@@ -1,3 +1,11 @@
 div(ng-show="profile.login")
   .editor(ui-ace="aceOption", ng-model="content", ng-style="{height: editorHeight + 'px'}")
   alert.fixed-top(ng-hide="content", type="info") Loading...
+  .panel-button-area
+    .panel-button
+      a(ng-click="show_panel = !show_panel") {{show_panel ? '-' : '+'}}
+  .panel-rect-area(ng-show="show_panel")
+    button(ng-click="aceEditor.navigateLeft()") &larr;
+    button(ng-click="aceEditor.navigateDown()") &darr;
+    button(ng-click="aceEditor.navigateUp()") &uarr;
+    button(ng-click="aceEditor.navigateRight()") &rarr;

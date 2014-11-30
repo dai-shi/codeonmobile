@@ -118,14 +118,13 @@ angular.module('MainModule').controller('EditCtrl', ['$scope', 'Profile', '$loca
       $timeout(updateEditorHeight, 10);
     });
     $scope.editorHeight = 200;
-    var aceEditor = null;
 
     function updateEditorHeight() {
-      if (!aceEditor) return;
+      if (!$scope.aceEditor) return;
       $scope.editorHeight = Math.max(200,
-        (1 + aceEditor.getSession().getScreenLength()) *
-        aceEditor.renderer.lineHeight +
-        aceEditor.renderer.scrollBar.getWidth());
+        (1 + $scope.aceEditor.getSession().getScreenLength()) *
+        $scope.aceEditor.renderer.lineHeight +
+        $scope.aceEditor.renderer.scrollBar.getWidth());
     }
     $window.addEventListener('resize', function() {
       $scope.$apply(updateEditorHeight);
@@ -138,7 +137,7 @@ angular.module('MainModule').controller('EditCtrl', ['$scope', 'Profile', '$loca
       theme: 'merbivore',
       mode: mode.match(/\/([^\/]+)$/)[1],
       onLoad: function(editor) {
-        aceEditor = editor;
+        $scope.aceEditor = editor;
       },
       onChange: updateEditorHeight
     };

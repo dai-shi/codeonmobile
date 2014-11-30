@@ -2,7 +2,6 @@
 .nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
 
 .topbar {
-  width: 100%;
   color: #aaa;
   background-color: #222;
   border-color: #111;
@@ -24,3 +23,42 @@
   z-index: 90;
 }
 
+.panel-button-area {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 80;
+}
+
+.panel-button a {
+  color: #000;
+  background-color: #fff;
+  opacity: 0.2;
+  font-family: monospace;
+  font-size: 20px;
+  text-align: center;
+  line-height: 40px;
+  height: 40px;
+  padding: 0 5px 0 5px;
+  overflow: hidden;
+  border-radius: 20px;
+}
+
+.panel-rect-area {
+  position: fixed;
+  top: 5px;
+  right: 50px;
+  z-index: 60;
+  background-color: #aaa;
+  border-radius: 3px;
+  padding: 2px;
+}
+
+.panel-rect-area button {
+  font-size: 20px;
+  text-align: center;
+  line-height: 30px;
+  width: 40px;
+  height: 40px;
+  margin: 5px;
+}
