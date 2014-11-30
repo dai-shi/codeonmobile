@@ -24,7 +24,7 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/* global angular: false, io: false */
+/* global angular: false, io: false, B64: false */
 
 angular.module('MainModule', ['ngRoute', 'ngResource', 'ngTouch', 'ngSanitize', 'ui.ace', 'ui.bootstrap']);
 
@@ -108,7 +108,7 @@ angular.module('MainModule').controller('EditCtrl', ['$scope', 'Profile', '$loca
     }, function(data) {
       if (data.encoding === 'base64') {
         try {
-          $scope.content = $window.atob(data.content.replace(/\s/g, ''));
+          $scope.content = B64.decode(data.content.replace(/\s/g, ''));
         } catch (e) {
           $window.alert('base64 decode error: ' + e);
         }

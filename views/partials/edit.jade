@@ -5,7 +5,7 @@ div(ng-show="profile.login")
     .panel-button
       a(ng-click="show_panel = !show_panel") {{show_panel ? '-' : '+'}}
   .panel-rect-area(ng-show="show_panel")
-    button(ng-click="aceEditor.navigateLeft()") &larr;
-    button(ng-click="aceEditor.navigateDown()") &darr;
-    button(ng-click="aceEditor.navigateUp()") &uarr;
-    button(ng-click="aceEditor.navigateRight()") &rarr;
+    button(ng-click="aceEditor.navigateLeft();$event.preventDefault()") &larr;
+    button(ng-click="aceEditor.navigateDown();$event.preventDefault()") &darr;
+    button(ng-click="aceEditor.navigateUp();$event.preventDefault()") &uarr;
+    button(ng-click="aceEditor.navigateRight();$event.preventDefault()") &rarr;
