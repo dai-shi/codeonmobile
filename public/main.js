@@ -144,13 +144,25 @@ angular.module('MainModule').factory('Profile', ['$http',
 
 angular.module('MainModule').factory('Repos', ['$resource',
   function($resource) {
-    return $resource('./api/repos');
+    return $resource('./api/repos', {}, {
+      query: {
+        method: 'GET',
+        isArray: true,
+        cache: true
+      }
+    });
   }
 ]);
 
 angular.module('MainModule').factory('RepoFiles', ['$resource',
   function($resource) {
-    return $resource('./api/repo/files');
+    return $resource('./api/repo/files', {}, {
+      query: {
+        method: 'GET',
+        isArray: true,
+        cache: true
+      }
+    });
   }
 ]);
 
