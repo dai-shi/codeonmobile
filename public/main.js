@@ -91,8 +91,8 @@ angular.module('MainModule').controller('RepoCtrl', ['$scope', 'Profile', '$loca
   }
 ]);
 
-angular.module('MainModule').controller('EditCtrl', ['$scope', 'Profile', '$location', 'RepoFileBlob', '$window',
-  function($scope, Profile, $location, RepoFileBlob, $window) {
+angular.module('MainModule').controller('EditCtrl', ['$scope', 'Profile', '$location', 'RepoFileBlob', '$window', '$timeout',
+  function($scope, Profile, $location, RepoFileBlob, $window, $timeout) {
     $scope.profile = Profile.data;
     $scope.repo_name = $location.search().name;
     $scope.repo_branch = $location.search().branch;
@@ -111,7 +111,28 @@ angular.module('MainModule').controller('EditCtrl', ['$scope', 'Profile', '$loca
       } else {
         $scope.content = data.content;
       }
+      $timeout(updateEditorHeight, 10);
     });
+    $scope.editorHeight = 200;
+    var aceEditor = null;
+
+    function updateEditorHeight() {
+      if (!aceEditor) return;
+      $scope.editorHeight =
+        (1 + aceEditor.getSession().getScreenLength()) *
+        aceEditor.renderer.lineHeight +
+        aceEditor.renderer.scrollBar.getWidth();
+    }
+    $scope.aceOption = {
+      useWrapMode: true,
+      showGutter: true,
+      theme: 'merbivore',
+      mode: 'javascript',
+      onLoad: function(ace) {
+        aceEditor = ace;
+      },
+      onChange: updateEditorHeight
+    };
   }
 ]);
 

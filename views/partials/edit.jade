@@ -1,7 +1,2 @@
-h1 Edit
-div(ng-hide="profile.login")
-  a(href="./auth/github") Sign in with GitHub
 div(ng-show="profile.login")
-  img.avatar(ng-src="{{profile.avatar_url}}")
-  p {{profile.name}}
-  .editor(ui-ace="{useWrapMode: true, showGutter: true, mode: 'yaml', theme: 'merbivore'}", ng-model="content", readonly="{{saving}}", ng-style="{height: '20em'}")
+  .editor(ui-ace="aceOption", ng-model="content", ng-style="{height: editorHeight + 'px'}")
