@@ -180,3 +180,22 @@ angular.module('MainModule').factory('RepoFileBlob', ['$resource',
     return $resource('./api/repo/file/blob');
   }
 ]);
+
+// ng-touchstart -> my-touchbegin
+angular.module('MainModule').directive('myTouchbegin', ['$parse', '$swipe',
+  function($parse, $swipe) {
+    return {
+      restrict: 'A',
+      link: function(scope, element, attrs) {
+        var handler = $parse(attrs.myTouchbegin);
+        $swipe.bind(element, {
+          start: function() {
+            scope.$apply(function() {
+              handler(scope);
+            });
+          }
+        });
+      }
+    };
+  }
+]);
