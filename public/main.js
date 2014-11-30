@@ -131,16 +131,19 @@ angular.module('MainModule').controller('EditCtrl', ['$scope', 'Profile', '$loca
     $window.addEventListener('resize', function() {
       $scope.$apply(updateEditorHeight);
     });
+    var modelist = $window.ace.require('ace/ext/modelist');
+    var mode = modelist.getModeForPath($scope.file_path).mode;
     $scope.aceOption = {
       useWrapMode: true,
       showGutter: true,
       theme: 'merbivore',
-      mode: 'javascript',
-      onLoad: function(ace) {
-        aceEditor = ace;
+      mode: mode.match(/\/([^\/]+)$/)[1],
+      onLoad: function(editor) {
+        aceEditor = editor;
       },
       onChange: updateEditorHeight
     };
+
   }
 ]);
 
