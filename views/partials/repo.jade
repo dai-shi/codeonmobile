@@ -5,6 +5,7 @@ div(ng-show="profile.login")
   img.avatar(ng-src="{{profile.avatar_url}}")
   p {{profile.name}}
   h2 Files
+  p(ng-hide="repo_files") Loading...
   ul
     li(ng-repeat="file in repo_files | filter:{type:'blob'}")
       a(href="#/edit?name={{repo_name}}&branch={{repo_branch}}&path={{file.path}}&sha={{file.sha}}") {{file.path}}

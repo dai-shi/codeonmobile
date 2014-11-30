@@ -75,7 +75,9 @@ angular.module('MainModule').run(['$rootScope', '$window', '$location',
 angular.module('MainModule').controller('HomeCtrl', ['$scope', 'Profile', 'Repos',
   function($scope, Profile, Repos) {
     $scope.profile = Profile.data;
-    $scope.repos = Repos.query();
+    Repos.query(function(data) {
+      $scope.repos = data;
+    });
   }
 ]);
 
@@ -84,9 +86,11 @@ angular.module('MainModule').controller('RepoCtrl', ['$scope', 'Profile', '$loca
     $scope.profile = Profile.data;
     $scope.repo_name = $location.search().name;
     $scope.repo_branch = $location.search().branch;
-    $scope.repo_files = RepoFiles.query({
+    RepoFiles.query({
       repo_name: $scope.repo_name,
       repo_branch: $scope.repo_branch
+    }, function(data) {
+      $scope.repo_files = data;
     });
   }
 ]);
@@ -98,6 +102,7 @@ angular.module('MainModule').controller('EditCtrl', ['$scope', 'Profile', '$loca
     $scope.repo_branch = $location.search().branch;
     $scope.file_path = $location.search().path;
     $scope.file_sha = $location.search().sha;
+    $scope.content = 'Loading...';
     RepoFileBlob.get({
       repo_name: $scope.repo_name,
       file_sha: $scope.file_sha
@@ -123,6 +128,9 @@ angular.module('MainModule').controller('EditCtrl', ['$scope', 'Profile', '$loca
         aceEditor.renderer.lineHeight +
         aceEditor.renderer.scrollBar.getWidth();
     }
+    $window.addEventListener('resize', function() {
+      $scope.$apply(updateEditorHeight);
+    });
     $scope.aceOption = {
       useWrapMode: true,
       showGutter: true,

@@ -5,6 +5,7 @@ div(ng-show="profile.login")
   img.avatar(ng-src="{{profile.avatar_url}}")
   p {{profile.name}}
   h2 Repos
+  p(ng-hide="repos") Loading...
   ul
     li(ng-repeat="repo in repos")
       a(href="#/repo?name={{repo.name}}&branch={{repo.default_branch}}") {{repo.name}}
