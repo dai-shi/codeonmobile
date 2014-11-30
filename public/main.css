@@ -1,5 +1,26 @@
 
-.avatar {
-  width: 50px;
-  height: 50px;
+.nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
+
+.topbar {
+  width: 100%;
+  color: #aaa;
+  background-color: #222;
+  border-color: #111;
+  font-size: 12px;
+  padding: 10px;
 }
+
+.avatar {
+  margin: 3px;
+  width: 40px;
+  height: 40px;
+}
+
+.fixed-top {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  right: 15px;
+  z-index: 90;
+}
+

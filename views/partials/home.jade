@@ -1,11 +1,12 @@
-h1 CodeOnMobile
-div(ng-hide="profile.login")
+.topbar CodeOnMobile
+.container(ng-hide="profile.login")
   a(href="./auth/github") Sign in with GitHub
-div(ng-show="profile.login")
-  img.avatar(ng-src="{{profile.avatar_url}}")
-  p {{profile.name}}
-  h2 Repos
-  p(ng-hide="repos") Loading...
-  ul
-    li(ng-repeat="repo in repos")
-      a(href="#/repo?name={{repo.name}}&branch={{repo.default_branch}}") {{repo.name}}
+.container(ng-show="profile.login")
+  .header
+    img.avatar.pull-right(ng-src="{{profile.avatar_url}}")
+    p.name.pull-right {{profile.name}}
+    h3.pull-left Repos
+  .clearfix
+  alert(ng-hide="repos", type="info") Loading...
+  .list-group
+    a.list-group-item(ng-repeat="repo in repos", href="#/repo?name={{repo.name}}&branch={{repo.default_branch}}") {{repo.name}}

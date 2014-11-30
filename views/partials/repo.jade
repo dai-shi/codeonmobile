@@ -1,11 +1,12 @@
-h1 Repo
-div(ng-hide="profile.login")
+.topbar CodeOnMobile > {{repo_name}}
+.container(ng-hide="profile.login")
   a(href="./auth/github") Sign in with GitHub
-div(ng-show="profile.login")
-  img.avatar(ng-src="{{profile.avatar_url}}")
-  p {{profile.name}}
-  h2 Files
-  p(ng-hide="repo_files") Loading...
-  ul
-    li(ng-repeat="file in repo_files | filter:{type:'blob'}")
-      a(href="#/edit?name={{repo_name}}&branch={{repo_branch}}&path={{file.path}}&sha={{file.sha}}") {{file.path}}
+.container(ng-show="profile.login")
+  .header
+    img.avatar.pull-right(ng-src="{{profile.avatar_url}}")
+    p.name.pull-right {{profile.name}}
+    h3.pull-left Files
+  .clearfix
+  alert(ng-hide="repo_files", type="info") Loading...
+  .list-group
+    a.list-group-item(ng-repeat="file in repo_files | filter:{type:'blob'}", href="#/edit?name={{repo_name}}&branch={{repo_branch}}&path={{file.path}}&sha={{file.sha}}") {{file.path}}

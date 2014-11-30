@@ -26,7 +26,7 @@
 
 /* global angular: false, io: false */
 
-angular.module('MainModule', ['ngRoute', 'ngResource', 'ngTouch', 'ngSanitize', 'ui.ace']);
+angular.module('MainModule', ['ngRoute', 'ngResource', 'ngTouch', 'ngSanitize', 'ui.ace', 'ui.bootstrap']);
 
 angular.module('MainModule').config(['$routeProvider',
   function($routeProvider) {
@@ -102,7 +102,6 @@ angular.module('MainModule').controller('EditCtrl', ['$scope', 'Profile', '$loca
     $scope.repo_branch = $location.search().branch;
     $scope.file_path = $location.search().path;
     $scope.file_sha = $location.search().sha;
-    $scope.content = 'Loading...';
     RepoFileBlob.get({
       repo_name: $scope.repo_name,
       file_sha: $scope.file_sha
@@ -123,10 +122,10 @@ angular.module('MainModule').controller('EditCtrl', ['$scope', 'Profile', '$loca
 
     function updateEditorHeight() {
       if (!aceEditor) return;
-      $scope.editorHeight =
+      $scope.editorHeight = Math.max(200,
         (1 + aceEditor.getSession().getScreenLength()) *
         aceEditor.renderer.lineHeight +
-        aceEditor.renderer.scrollBar.getWidth();
+        aceEditor.renderer.scrollBar.getWidth());
     }
     $window.addEventListener('resize', function() {
       $scope.$apply(updateEditorHeight);

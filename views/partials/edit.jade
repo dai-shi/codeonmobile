@@ -1,2 +1,3 @@
 div(ng-show="profile.login")
   .editor(ui-ace="aceOption", ng-model="content", ng-style="{height: editorHeight + 'px'}")
+  alert.fixed-top(ng-hide="content", type="info") Loading...
