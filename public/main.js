@@ -103,7 +103,11 @@ angular.module('MainModule').controller('EditCtrl', ['$scope', 'Profile', '$loca
       file_sha: $scope.file_sha
     }, function(data) {
       if (data.encoding === 'base64') {
-        $scope.content = $window.atob(data.content);
+        try {
+          $scope.content = $window.atob(data.content.replace(/\s/g, ''));
+        } catch (e) {
+          $window.alert('base64 decode error: ' + e);
+        }
       } else {
         $scope.content = data.content;
       }
