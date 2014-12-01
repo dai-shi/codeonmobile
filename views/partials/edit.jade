@@ -1,11 +1,13 @@
 div(ng-show="profile.login")
   .editor(ui-ace="aceOption", ng-model="content", ng-style="{height: editorHeight + 'px'}")
-  alert.fixed-top(ng-hide="content", type="info") Loading...
-  .panel-button-area
-    .panel-button
-      a(ng-click="show_panel = !show_panel") {{show_panel ? '-' : '+'}}
-  .panel-rect-area(ng-show="show_panel")
-    button(ng-click="aceEditor.navigateLeft();$event.preventDefault()") &larr;
-    button(ng-click="aceEditor.navigateDown();$event.preventDefault()") &darr;
-    button(ng-click="aceEditor.navigateUp();$event.preventDefault()") &uarr;
-    button(ng-click="aceEditor.navigateRight();$event.preventDefault()") &rarr;
+  alert.alert-top(ng-hide="content", type="info") Loading...
+  .panel-area(ng-style="{top: scrollTop + 'px'}")
+    .panel-button-area
+      .panel-button
+        a(ng-click="show_panel = !show_panel;$event.preventDefault()")
+          span.glyphicon(ng-class="{'glyphicon-plus': !show_panel, 'glyphicon-minus': show_panel}")
+    .panel-rect-area(ng-show="show_panel")
+      button(ng-click="aceEditor.navigateLeft();$event.preventDefault()") &larr;
+      button(ng-click="aceEditor.navigateDown();$event.preventDefault()") &darr;
+      button(ng-click="aceEditor.navigateUp();$event.preventDefault()") &uarr;
+      button(ng-click="aceEditor.navigateRight();$event.preventDefault()") &rarr;

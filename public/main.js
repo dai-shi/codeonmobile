@@ -69,6 +69,10 @@ angular.module('MainModule').run(['$rootScope', '$window', '$location',
       socket.emit('message', data);
     };
 
+    angular.element($window).bind('scroll', function() {
+      $rootScope.$broadcast('scroll');
+    });
+
   }
 ]);
 
@@ -121,8 +125,7 @@ angular.module('MainModule').controller('EditCtrl', ['$scope', 'Profile', '$loca
 
     function updateEditorHeight() {
       if (!$scope.aceEditor) return;
-      $scope.editorHeight = Math.max(200,
-        (1 + $scope.aceEditor.getSession().getScreenLength()) *
+      $scope.editorHeight = Math.max(200, (1 + $scope.aceEditor.getSession().getScreenLength()) *
         $scope.aceEditor.renderer.lineHeight +
         $scope.aceEditor.renderer.scrollBar.getWidth());
     }
@@ -141,6 +144,12 @@ angular.module('MainModule').controller('EditCtrl', ['$scope', 'Profile', '$loca
       },
       onChange: updateEditorHeight
     };
+    $scope.scrollTop = 0;
+    $scope.$on('scroll', function() {
+      $scope.$apply(function() {
+        $scope.scrollTop = $window.document.body.scrollTop;
+      });
+    });
 
   }
 ]);

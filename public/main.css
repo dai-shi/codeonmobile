@@ -5,7 +5,7 @@
   color: #aaa;
   background-color: #222;
   border-color: #111;
-  font-size: 12px;
+  font-size: 16px;
   padding: 10px;
 }
 
@@ -15,7 +15,7 @@
   height: 40px;
 }
 
-.fixed-top {
+.alert-top {
   position: absolute;
   top: 15px;
   left: 15px;
@@ -23,11 +23,15 @@
   z-index: 90;
 }
 
-.panel-button-area {
-  position: fixed;
-  top: 20px;
-  right: 20px;
+.panel-area {
+  position: absolute;
+  right: 0;
   z-index: 80;
+}
+
+.panel-button-area {
+  float: right;
+  margin: 0 3px 0 3px;
 }
 
 .panel-button a {
@@ -39,18 +43,16 @@
   text-align: center;
   line-height: 40px;
   height: 40px;
-  padding: 0 5px 0 5px;
+  padding: 5px;
   overflow: hidden;
   border-radius: 20px;
   text-decoration: none;
 }
 
 .panel-rect-area {
-  position: fixed;
-  top: 5px;
-  right: 50px;
-  z-index: 60;
+  float: right;
   background-color: #aaa;
+  opacity: 0.6;
   border-radius: 3px;
   padding: 2px;
   user-select: none;
