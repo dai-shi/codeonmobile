@@ -121,6 +121,7 @@ angular.module('MainModule').controller('EditCtrl', ['$scope', 'Profile', '$loca
       }
       $timeout(updateEditorHeight, 10);
     });
+
     $scope.editorHeight = 200;
 
     function updateEditorHeight() {
@@ -141,6 +142,11 @@ angular.module('MainModule').controller('EditCtrl', ['$scope', 'Profile', '$loca
       mode: mode.match(/\/([^\/]+)$/)[1],
       onLoad: function(editor) {
         $scope.aceEditor = editor;
+        var aceTA = $window.document.getElementsByClassName('ace_text-input')[0];
+        aceTA.setAttribute('autocorrect', 'off');
+        $scope.aceEditor.session.selection.on('changeCursor', function() {
+          $scope.cursorTop = $scope.aceEditor.renderer.$cursorLayer.getPixelPosition().top + 'px';
+        });
       },
       onChange: updateEditorHeight
     };
@@ -150,6 +156,49 @@ angular.module('MainModule').controller('EditCtrl', ['$scope', 'Profile', '$loca
         $scope.scrollTop = $window.document.body.scrollTop;
       });
     });
+
+    $scope.commandMode = false;
+    var textareaEle = $window.document.getElementById('panel-textarea');
+    angular.element(textareaEle).on('focus', function() {
+      $scope.commandMode = true;
+    });
+    angular.element(textareaEle).on('blur', function() {
+      $scope.commandMode = false;
+    });
+    angular.element(textareaEle).on('keydown', function(event) {
+      //console.log(event.keyCode);
+      switch (event.keyCode) {
+      case 72:
+        $scope.aceEditor.navigateLeft();
+        break;
+      case 74:
+        $scope.aceEditor.navigateDown();
+        break;
+      case 75:
+        $scope.aceEditor.navigateUp();
+        break;
+      case 76:
+        $scope.aceEditor.navigateRight();
+        break;
+      case 85:
+        $scope.aceEditor.undo();
+        break;
+      case 82:
+        $scope.aceEditor.redo();
+        break;
+      case 81:
+        $scope.aceEditor.focus();
+        break;
+      }
+      event.preventDefault();
+    });
+    $scope.toggleCommandMode = function() {
+      if ($scope.commandMode) {
+        $scope.aceEditor.focus();
+      } else {
+        textareaEle.focus();
+      }
+    };
 
   }
 ]);

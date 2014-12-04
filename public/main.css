@@ -25,44 +25,51 @@
 
 .panel-area {
   position: absolute;
-  right: 0;
+  top: 2px;
+  right: 2px;
   z-index: 80;
+  pointer-events: none;
 }
 
-.panel-button-area {
-  float: right;
-  margin: 0 3px 0 3px;
+#panel-textarea {
+  position: absolute;
+  width: 0;
+  height: 0;
+  font-size: 0;
+  opacity: 0;
 }
 
 .panel-button a {
+  float: right;
   color: #000;
   background-color: #fff;
   opacity: 0.2;
-  font-family: monospace;
   font-size: 20px;
   text-align: center;
-  line-height: 40px;
-  height: 40px;
-  padding: 5px;
-  overflow: hidden;
+  line-height: 100%;
+  padding: 5px 6px;
   border-radius: 20px;
   text-decoration: none;
+  pointer-events: auto;
 }
 
-.panel-rect-area {
+.panel-help {
   float: right;
-  background-color: #aaa;
-  opacity: 0.6;
-  border-radius: 3px;
-  padding: 2px;
-  user-select: none;
-  -webkit-user-select: none;
 }
 
-.panel-rect-area button {
-  font-size: 20px;
-  text-align: center;
-  width: 40px;
-  height: 40px;
-  margin: 5px;
+.panel-help a {
+  float: right;
+  text-decoration: none;
+  pointer-events: auto;
+}
+
+.panel-help-content {
+  clear: right;
+  background-color: rgba(255,255,255,0.4);
+  padding: 6px;
+  border-radius: 3px;
+}
+
+.panel-help-item {
+  line-height: 100%;
 }

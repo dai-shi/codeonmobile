@@ -1,13 +1,18 @@
 div(ng-show="profile.login")
   .editor(ui-ace="aceOption", ng-model="content", ng-style="{height: editorHeight + 'px'}")
   alert.alert-top(ng-hide="content", type="info") Loading...
+  textarea#panel-textarea(ng-style="{top: cursorTop}", autocorrect="off", autocapitalize="off")
   .panel-area(ng-style="{top: scrollTop + 'px'}")
-    .panel-button-area
-      .panel-button
-        a(ng-click="show_panel = !show_panel;$event.preventDefault()")
-          span.glyphicon(ng-class="{'glyphicon-plus': !show_panel, 'glyphicon-minus': show_panel}")
-    .panel-rect-area(ng-show="show_panel")
-      button(ng-click="aceEditor.navigateLeft();$event.preventDefault()") &larr;
-      button(ng-click="aceEditor.navigateDown();$event.preventDefault()") &darr;
-      button(ng-click="aceEditor.navigateUp();$event.preventDefault()") &uarr;
-      button(ng-click="aceEditor.navigateRight();$event.preventDefault()") &rarr;
+    .panel-button
+      a(ng-click="toggleCommandMode(); $event.preventDefault()")
+        span.glyphicon(ng-class="{'glyphicon-pencil': !commandMode, 'glyphicon-wrench': commandMode}")
+    .panel-help(ng-show="commandMode")
+      a(ng-click="show_help = !show_help; $event.preventDefault()") Keybind help
+      .panel-help-content(ng-show="commandMode && show_help")
+        .panel-help-item h: cursor left
+        .panel-help-item j: cursor down
+        .panel-help-item k: cursor up
+        .panel-help-item l: cursor right
+        .panel-help-item u: undo
+        .panel-help-item r: redo
+        .panel-help-item q: exit command mode
