@@ -144,7 +144,7 @@ angular.module('MainModule').controller('EditCtrl', ['$scope', 'Profile', '$loca
         $scope.aceEditor = editor;
         var aceTA = $window.document.getElementsByClassName('ace_text-input')[0];
         aceTA.setAttribute('autocorrect', 'off');
-        $scope.aceEditor.session.selection.on('changeCursor', function() {
+        $scope.aceEditor.getSession().selection.on('changeCursor', function() {
           $scope.cursorTop = $scope.aceEditor.renderer.$cursorLayer.getPixelPosition().top + 'px';
         });
       },
@@ -173,9 +173,11 @@ angular.module('MainModule').controller('EditCtrl', ['$scope', 'Profile', '$loca
         break;
       case 74:
         $scope.aceEditor.navigateDown();
+        $window.document.body.scrollTop += $scope.aceEditor.renderer.lineHeight;
         break;
       case 75:
         $scope.aceEditor.navigateUp();
+        $window.document.body.scrollTop -= $scope.aceEditor.renderer.lineHeight;
         break;
       case 76:
         $scope.aceEditor.navigateRight();
@@ -185,6 +187,13 @@ angular.module('MainModule').controller('EditCtrl', ['$scope', 'Profile', '$loca
         break;
       case 82:
         $scope.aceEditor.redo();
+        break;
+      case 88:
+        var session = $scope.aceEditor.getSession();
+        var selection = session.selection;
+        selection.selectRight();
+        session.remove(selection.getRange());
+        selection.clearSelection();
         break;
       case 81:
         $scope.aceEditor.focus();
