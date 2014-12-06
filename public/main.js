@@ -85,8 +85,8 @@ angular.module('MainModule').controller('HomeCtrl', ['$scope', 'Profile', 'Repos
   }
 ]);
 
-angular.module('MainModule').controller('RepoCtrl', ['$scope', 'Profile', '$location', 'RepoFiles',
-  function($scope, Profile, $location, RepoFiles) {
+angular.module('MainModule').controller('RepoCtrl', ['$scope', 'Profile', '$location', 'RepoFiles', 'FileCacheService',
+  function($scope, Profile, $location, RepoFiles, FileCacheService) {
     $scope.profile = Profile.data;
     $scope.repo_name = $location.search().name;
     $scope.repo_branch = $location.search().branch;
@@ -96,30 +96,49 @@ angular.module('MainModule').controller('RepoCtrl', ['$scope', 'Profile', '$loca
     }, function(data) {
       $scope.repo_files = data;
     });
+    $scope.checkModified = function(path) {
+      return FileCacheService.isModified($scope.repo_name, $scope.repo_branch, path);
+    };
+    $scope.deleteModified = function(path) {
+      FileCacheService.deleteModified($scope.repo_name, $scope.repo_branch, path);
+    };
   }
 ]);
 
-angular.module('MainModule').controller('EditCtrl', ['$scope', 'Profile', '$location', 'RepoFileBlob', '$window', '$timeout',
-  function($scope, Profile, $location, RepoFileBlob, $window, $timeout) {
+angular.module('MainModule').controller('EditCtrl', ['$scope', 'Profile', '$location', 'RepoFileBlob', 'FileCacheService', '$window', '$timeout', '$interval',
+  function($scope, Profile, $location, RepoFileBlob, FileCacheService, $window, $timeout, $interval) {
     $scope.profile = Profile.data;
     $scope.repo_name = $location.search().name;
     $scope.repo_branch = $location.search().branch;
     $scope.file_path = $location.search().path;
     $scope.file_sha = $location.search().sha;
+    $scope.content = null;
     RepoFileBlob.get({
       repo_name: $scope.repo_name,
       file_sha: $scope.file_sha
     }, function(data) {
+      var content = data.content;
       if (data.encoding === 'base64') {
         try {
-          $scope.content = B64.decode(data.content.replace(/\s/g, ''));
+          content = B64.decode(data.content.replace(/\s/g, ''));
         } catch (e) {
           $window.alert('base64 decode error: ' + e);
         }
-      } else {
-        $scope.content = data.content;
       }
+      FileCacheService.setOriginal($scope.repo_name, $scope.repo_branch, $scope.file_path, content);
+      $scope.content = FileCacheService.get($scope.repo_name, $scope.repo_branch, $scope.file_path);
       $timeout(updateEditorHeight, 10);
+    });
+    var autosaveTimer = $interval(function() {
+      if ($scope.content) {
+        FileCacheService.setModified($scope.repo_name, $scope.repo_branch, $scope.file_path, $scope.content);
+      }
+    }, 10 * 1000);
+    $scope.$on('$routeChangeStart', function() {
+      $interval.cancel(autosaveTimer);
+      if ($scope.content) {
+        FileCacheService.setModified($scope.repo_name, $scope.repo_branch, $scope.file_path, $scope.content);
+      }
     });
 
     $scope.editorHeight = 200;
@@ -246,6 +265,38 @@ angular.module('MainModule').factory('RepoFileBlob', ['$resource',
   function($resource) {
     return $resource('./api/repo/file/blob');
   }
+]);
+
+angular.module('MainModule').factory('FileCacheService', [function() {
+  var cacheOriginal = {};
+  var cacheModified = {};
+  return {
+    setOriginal: function(repo, branch, path, content) {
+      var key = repo + ':' + branch + ':' + path;
+      cacheOriginal[key] = content;
+    },
+    setModified: function(repo, branch, path, content) {
+      var key = repo + ':' + branch + ':' + path;
+      if (cacheOriginal[key] === content) {
+        delete cacheModified[key];
+      } else {
+        cacheModified[key] = content;
+      }
+    },
+    deleteModified: function(repo, branch, path, content) {
+      var key = repo + ':' + branch + ':' + path;
+      delete cacheModified[key];
+    },
+    get: function(repo, branch, path) {
+      var key = repo + ':' + branch + ':' + path;
+      return cacheModified[key] || cacheOriginal[key] || false;
+    },
+    isModified: function(repo, branch, path) {
+      var key = repo + ':' + branch + ':' + path;
+      return !!cacheModified[key];
+    }
+  };
+}
 ]);
 
 // ng-touchstart -> my-touchbegin

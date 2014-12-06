@@ -1,6 +1,6 @@
 div(ng-show="profile.login")
   .editor(ui-ace="aceOption", ng-model="content", ng-style="{height: editorHeight + 'px'}")
-  alert.alert-top(ng-hide="content", type="info") Loading...
+  alert.alert-top(ng-show="content === null", type="info") Loading...
   textarea#panel-textarea(ng-style="{top: cursorTop}", autocorrect="off", autocapitalize="off")
   .panel-area(ng-style="{top: scrollTop + 'px'}")
     .panel-button
@@ -15,4 +15,5 @@ div(ng-show="profile.login")
         .panel-help-item l: cursor right
         .panel-help-item u: undo
         .panel-help-item r: redo
+        .panel-help-item x: delete char right
         .panel-help-item q: exit command mode

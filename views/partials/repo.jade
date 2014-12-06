@@ -9,4 +9,9 @@
   .clearfix
   alert(ng-hide="repo_files", type="info") Loading...
   .list-group
-    a.list-group-item(ng-repeat="file in repo_files | filter:{type:'blob'}", href="#/edit?name={{repo_name}}&branch={{repo_branch}}&path={{file.path}}&sha={{file.sha}}") {{file.path}}
+    a.list-group-item(ng-repeat="file in repo_files | filter:{type:'blob'}", href="#/edit?name={{repo_name}}&branch={{repo_branch}}&path={{file.path}}&sha={{file.sha}}")
+      span {{file.path}}
+      span.text-danger(ng-show="checkModified(file.path)")
+        span &nbsp;
+        span.glyphicon.glyphicon-asterisk.small
+      button.pull-right(ng-show="checkModified(file.path)", ng-click="deleteModified(file.path); $event.preventDefault()") Revert
