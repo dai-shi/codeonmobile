@@ -33,7 +33,8 @@ var express_session = require('express-session');
 var socket_io = require('socket.io');
 var passport = require('passport');
 var GitHubStrategy = require('passport-github').Strategy;
-var GitHubApi = require("github");
+var GitHubApi = require('github');
+var async = require('async');
 
 passport.serializeUser(function(user, done) {
   done(null, user);
@@ -139,7 +140,7 @@ app.get('/api/repos', function(req, res) {
 
 app.get('/api/repo/files', function(req, res) {
   if (!req.user) {
-    res.json([]);
+    res.json({});
     return;
   }
   var github = getGitHubUserClient(req.user);
@@ -153,11 +154,11 @@ app.get('/api/repo/files', function(req, res) {
       res.sendStatus(500);
       return;
     }
-    var sha = result.object.sha;
+    var branch_sha = result.object.sha;
     github.gitdata.getTree({
       user: req.user.profile.username,
       repo: req.query.repo_name,
-      sha: sha,
+      sha: branch_sha,
       recursive: true
     }, function(err, result) {
       if (err) {
@@ -165,7 +166,7 @@ app.get('/api/repo/files', function(req, res) {
         res.sendStatus(500);
         return;
       }
-      res.json(result.tree);
+      res.json(result);
     });
   });
 });
@@ -188,6 +189,72 @@ app.get('/api/repo/file/blob', function(req, res) {
     }
     delete result.meta;
     res.json(result);
+  });
+});
+
+app.post('/api/commit', function(req, res) {
+  if (!req.user) {
+    res.json(false);
+    return;
+  }
+  var github = getGitHubUserClient(req.user);
+  async.waterfall([
+
+    function(cb) {
+      github.gitdata.getReference({
+        user: req.user.profile.username,
+        repo: req.body.repo_name,
+        ref: 'heads/' + req.body.repo_branch
+      }, cb);
+    },
+    function(result, cb) {
+      var branch_sha = result.object.sha;
+      if (branch_sha !== req.body.parent_sha) {
+        cb('commit proceeds from the previous state');
+        return;
+      }
+      var tree = req.body.files.map(function(file) {
+        return {
+          path: file.path,
+          mode: '100644',
+          type: 'blob',
+          content: file.content
+        };
+      });
+      github.gitdata.createTree({
+        user: req.user.profile.username,
+        repo: req.body.repo_name,
+        tree: tree,
+        base_tree: req.body.parent_sha
+      }, cb);
+    },
+    function(result, cb) {
+      var new_sha = result.sha;
+      github.gitdata.createTree({
+        user: req.user.profile.username,
+        repo: req.body.repo_name,
+        message: req.body.message,
+        tree: new_sha,
+        parents: [req.body.parent_sha]
+      }, cb);
+    },
+    function(result, cb) {
+      var new_commit_sha = result.sha;
+      github.gitdata.updateReference({
+        user: req.user.profile.username,
+        repo: req.body.repo_name,
+        ref: 'heads/' + req.body.repo_branch,
+        sha: new_commit_sha
+      }, cb);
+    }
+
+  ], function(err) {
+    if (err) {
+      console.log('error in creating a new commit', err);
+      res.sendStatus(500);
+      return;
+    }
+    res.json(true);
   });
 });
 

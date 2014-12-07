@@ -94,7 +94,8 @@ angular.module('MainModule').controller('RepoCtrl', ['$scope', 'Profile', '$loca
       repo_name: $scope.repo_name,
       repo_branch: $scope.repo_branch
     }, function(data) {
-      $scope.repo_files = data;
+      $scope.tree_sha = data.sha;
+      $scope.repo_files = data.tree;
     });
     $scope.checkModified = function(path) {
       return FileCacheService.isModified($scope.repo_name, $scope.repo_branch, path);
@@ -256,7 +257,7 @@ angular.module('MainModule').factory('RepoFiles', ['$resource',
     return $resource('./api/repo/files', {}, {
       query: {
         method: 'GET',
-        isArray: true,
+        isArray: false,
         cache: true
       }
     });
@@ -265,7 +266,12 @@ angular.module('MainModule').factory('RepoFiles', ['$resource',
 
 angular.module('MainModule').factory('RepoFileBlob', ['$resource',
   function($resource) {
-    return $resource('./api/repo/file/blob');
+    return $resource('./api/repo/file/blob', {}, {
+      get: {
+        method: 'GET',
+        cache: true
+      }
+    });
   }
 ]);
 
