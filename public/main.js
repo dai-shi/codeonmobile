@@ -85,8 +85,8 @@ angular.module('MainModule').controller('HomeCtrl', ['$scope', 'Profile', 'Repos
   }
 ]);
 
-angular.module('MainModule').controller('RepoCtrl', ['$scope', 'Profile', '$location', 'RepoFiles', 'FileCacheService',
-  function($scope, Profile, $location, RepoFiles, FileCacheService) {
+angular.module('MainModule').controller('RepoCtrl', ['$scope', 'Profile', '$location', 'RepoFiles', 'FileCacheService', '$window',
+  function($scope, Profile, $location, RepoFiles, FileCacheService, $window) {
     $scope.profile = Profile.data;
     $scope.repo_name = $location.search().name;
     $scope.repo_branch = $location.search().branch;
@@ -100,7 +100,9 @@ angular.module('MainModule').controller('RepoCtrl', ['$scope', 'Profile', '$loca
       return FileCacheService.isModified($scope.repo_name, $scope.repo_branch, path);
     };
     $scope.deleteModified = function(path) {
-      FileCacheService.deleteModified($scope.repo_name, $scope.repo_branch, path);
+      if ($window.confirm('Are you sure to delete all changes you made to this file?')) {
+        FileCacheService.deleteModified($scope.repo_name, $scope.repo_branch, path);
+      }
     };
   }
 ]);
@@ -283,7 +285,7 @@ angular.module('MainModule').factory('FileCacheService', [function() {
         cacheModified[key] = content;
       }
     },
-    deleteModified: function(repo, branch, path, content) {
+    deleteModified: function(repo, branch, path) {
       var key = repo + ':' + branch + ':' + path;
       delete cacheModified[key];
     },
