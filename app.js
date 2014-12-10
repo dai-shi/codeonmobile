@@ -120,7 +120,7 @@ app.get('/api/repos', function(req, res) {
   var github = getGitHubUserClient(req.user);
   github.repos.getAll({
     type: 'owner',
-    sort: 'updated',
+    sort: 'pushed',
     per_page: 100
   }, function(err, result) {
     if (err) {
