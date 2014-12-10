@@ -24,7 +24,8 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/* global angular: false, io: false, B64: false */
+/* global angular, io, B64 */
+/* global difflib, Diff2Html */
 
 angular.module('MainModule', ['ngRoute', 'ngResource', 'ngTouch', 'ngSanitize', 'ui.ace', 'ui.bootstrap']);
 
@@ -41,6 +42,13 @@ angular.module('MainModule').config(['$routeProvider',
     when('/repo', {
       templateUrl: 'static/partials/repo.html',
       controller: 'RepoCtrl',
+      resolve: {
+        Profile: 'Profile'
+      }
+    }).
+    when('/diff', {
+      templateUrl: 'static/partials/diff.html',
+      controller: 'DiffCtrl',
       resolve: {
         Profile: 'Profile'
       }
@@ -97,13 +105,48 @@ angular.module('MainModule').controller('RepoCtrl', ['$scope', 'Profile', '$loca
       $scope.tree_sha = data.sha;
       $scope.repo_files = data.tree;
     });
-    $scope.checkModified = function(path) {
-      return FileCacheService.isModified($scope.repo_name, $scope.repo_branch, path);
+    $scope.checkModified = function(file) {
+      return FileCacheService.isModified($scope.repo_name, $scope.repo_branch, file.path);
     };
-    $scope.deleteModified = function(path) {
-      if ($window.confirm('Are you sure to delete all changes you made to this file?')) {
-        FileCacheService.deleteModified($scope.repo_name, $scope.repo_branch, path);
+    $scope.checkAllModified = function() {
+      var files = $scope.repo_files;
+      if (!files) return false;
+      for (var i = 0; i < files.length; i++) {
+        if (files[i].type === 'blob' && $scope.checkModified(files[i])) {
+          return true;
+        }
       }
+      return false;
+    };
+    $scope.deleteModified = function(file) {
+      if ($window.confirm('Are you sure to delete all changes you made to this file?')) {
+        FileCacheService.deleteModified($scope.repo_name, $scope.repo_branch, file.path);
+      }
+    };
+  }
+]);
+
+
+angular.module('MainModule').controller('DiffCtrl', ['$scope', 'Profile', '$location', 'RepoFiles', 'FileCacheService',
+  function($scope, Profile, $location, RepoFiles, FileCacheService) {
+    $scope.profile = Profile.data;
+    $scope.repo_name = $location.search().name;
+    $scope.repo_branch = $location.search().branch;
+    RepoFiles.query({
+      repo_name: $scope.repo_name,
+      repo_branch: $scope.repo_branch
+    }, function(data) {
+      $scope.tree_sha = data.sha;
+      $scope.repo_files = data.tree;
+    });
+    $scope.checkModified = function(file) {
+      return FileCacheService.isModified($scope.repo_name, $scope.repo_branch, file.path);
+    };
+    $scope.getModified = function(file) {
+      return FileCacheService.get($scope.repo_name, $scope.repo_branch, file.path);
+    };
+    $scope.getOriginal = function(file) {
+      return FileCacheService.getOriginal($scope.repo_name, $scope.repo_branch, file.path);
     };
   }
 ]);
@@ -295,6 +338,10 @@ angular.module('MainModule').factory('FileCacheService', [function() {
       var key = repo + ':' + branch + ':' + path;
       delete cacheModified[key];
     },
+    getOriginal: function(repo, branch, path) {
+      var key = repo + ':' + branch + ':' + path;
+      return cacheOriginal[key] || false;
+    },
     get: function(repo, branch, path) {
       var key = repo + ':' + branch + ':' + path;
       return cacheModified[key] || cacheOriginal[key] || false;
@@ -305,6 +352,27 @@ angular.module('MainModule').factory('FileCacheService', [function() {
     }
   };
 }
+]);
+
+angular.module('MainModule').directive('myDiff', [
+  function() {
+    return {
+      restrict: 'AE',
+      scope: {
+        path: '@',
+        oldContent: '@',
+        newContent: '@'
+      },
+      link: function(scope, element /*, attrs*/) {
+        var udiff = difflib.unifiedDiff(scope.oldContent.split('\n'), scope.newContent.split('\n'), {
+          lineterm: ''
+        });
+        var udiffStr = 'diff --git a/' + scope.path + ' b/' + scope.path + '\n';
+        udiffStr += udiff.join('\n');
+        element[0].innerHTML = Diff2Html.getPrettyHtmlFromDiff(udiffStr);
+      }
+    };
+  }
 ]);
 
 // ng-touchstart -> my-touchbegin

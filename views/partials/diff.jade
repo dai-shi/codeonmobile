@@ -1,0 +1,12 @@
+.topbar CodeOnMobile > {{repo_name}} > Diff
+.container(ng-hide="profile.login")
+  a(href="./auth/github") Sign in with GitHub
+.container(ng-show="profile.login")
+  .header-area
+    img.avatar.pull-right(ng-src="{{profile.avatar_url}}")
+    p.name.pull-right {{profile.name}}
+    h3.pull-left Diff
+  .clearfix
+  alert(ng-hide="repo_files", type="info") Loading...
+.diff-item(ng-repeat="file in repo_files | filter:{type:'blob'} | filter:checkModified")
+  my-diff(path="{{file.path}}", old-content="{{getOriginal(file)}}", new-content="{{getModified(file)}}")

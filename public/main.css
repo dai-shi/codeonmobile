@@ -23,6 +23,25 @@
   z-index: 90;
 }
 
+.d2h-diff-table * {
+  -webkit-box-sizing: content-box;
+  box-sizing: content-box;
+}
+
+.d2h-code-linenumber {
+  position: inherit;
+}
+
+.d2h-code-linenumber[colspan="2"] {
+  position: absolute;
+  z-index: -1;
+}
+
+.d2h-code-line {
+  margin-left: 0;
+}
+
+
 .panel-area {
   position: absolute;
   top: 2px;
