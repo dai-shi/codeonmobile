@@ -9,10 +9,11 @@
   .clearfix
   alert(ng-hide="repo_files", type="info") Loading...
   .list-group
-    a.list-group-item(ng-repeat="file in repo_files | filter:{type:'blob'}", href="#/edit?name={{repo_name}}&branch={{repo_branch}}&path={{file.path}}&sha={{file.sha}}")
+    a.list-group-item(ng-repeat="file in repo_files", href="#/edit?name={{repo_name}}&branch={{repo_branch}}&path={{file.path}}&sha={{file.sha}}")
       span {{file.path}}
       span.text-danger(ng-show="checkModified(file)")
         span &nbsp;
         span.glyphicon.glyphicon-asterisk.small
       button.pull-right(ng-show="checkModified(file)", ng-click="deleteModified(file); $event.preventDefault()") Revert
   a.btn.btn-primary(ng-disabled="!checkAllModified()", href="#/diff?name={{repo_name}}&branch={{repo_branch}}") Show Diff
+  p &nbsp;

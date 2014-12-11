@@ -166,6 +166,7 @@ app.get('/api/repo/files', function(req, res) {
         res.sendStatus(500);
         return;
       }
+      delete result.meta;
       res.json(result);
     });
   });

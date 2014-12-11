@@ -103,7 +103,9 @@ angular.module('MainModule').controller('RepoCtrl', ['$scope', 'Profile', '$loca
       repo_branch: $scope.repo_branch
     }, function(data) {
       $scope.tree_sha = data.sha;
-      $scope.repo_files = data.tree;
+      $scope.repo_files = data.tree.filter(function(file) {
+        return file.type === 'blob' && file.size < 100 * 1000;
+      });
     });
     $scope.checkModified = function(file) {
       return FileCacheService.isModified($scope.repo_name, $scope.repo_branch, file.path);
@@ -112,7 +114,7 @@ angular.module('MainModule').controller('RepoCtrl', ['$scope', 'Profile', '$loca
       var files = $scope.repo_files;
       if (!files) return false;
       for (var i = 0; i < files.length; i++) {
-        if (files[i].type === 'blob' && $scope.checkModified(files[i])) {
+        if ($scope.checkModified(files[i])) {
           return true;
         }
       }
