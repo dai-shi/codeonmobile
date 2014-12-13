@@ -24,6 +24,9 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+/* jshint undef: true, unused: true, latedef: true */
+/* jshint quotmark: single, eqeqeq: true */
+
 /* global angular, io, B64 */
 /* global difflib, Diff2Html */
 
@@ -102,7 +105,6 @@ angular.module('MainModule').controller('RepoCtrl', ['$scope', 'Profile', '$loca
       repo_name: $scope.repo_name,
       repo_branch: $scope.repo_branch
     }, function(data) {
-      $scope.tree_sha = data.sha;
       $scope.repo_files = data.tree.filter(function(file) {
         return file.type === 'blob' && file.size < 100 * 1000;
       });
@@ -129,8 +131,8 @@ angular.module('MainModule').controller('RepoCtrl', ['$scope', 'Profile', '$loca
 ]);
 
 
-angular.module('MainModule').controller('DiffCtrl', ['$scope', 'Profile', '$location', 'RepoFiles', 'FileCacheService',
-  function($scope, Profile, $location, RepoFiles, FileCacheService) {
+angular.module('MainModule').controller('DiffCtrl', ['$scope', 'Profile', '$location', '$http', '$window', 'RepoFiles', 'FileCacheService', 'RepoFilesCache',
+  function($scope, Profile, $location, $http, $window, RepoFiles, FileCacheService, RepoFilesCache) {
     $scope.profile = Profile.data;
     $scope.repo_name = $location.search().name;
     $scope.repo_branch = $location.search().branch;
@@ -138,8 +140,10 @@ angular.module('MainModule').controller('DiffCtrl', ['$scope', 'Profile', '$loca
       repo_name: $scope.repo_name,
       repo_branch: $scope.repo_branch
     }, function(data) {
-      $scope.tree_sha = data.sha;
-      $scope.repo_files = data.tree;
+      $scope.commit_sha = data.sha;
+      $scope.repo_files = data.tree.filter(function(file) {
+        return file.type === 'blob' && file.size < 100 * 1000;
+      });
     });
     $scope.checkModified = function(file) {
       return FileCacheService.isModified($scope.repo_name, $scope.repo_branch, file.path);
@@ -149,6 +153,31 @@ angular.module('MainModule').controller('DiffCtrl', ['$scope', 'Profile', '$loca
     };
     $scope.getOriginal = function(file) {
       return FileCacheService.getOriginal($scope.repo_name, $scope.repo_branch, file.path);
+    };
+    $scope.doCommit = function() {
+      var files = $scope.repo_files.filter($scope.checkModified);
+      $scope.committing = true;
+      $http.post('./api/commit', {
+        repo_name: $scope.repo_name,
+        repo_branch: $scope.repo_branch,
+        parent_sha: $scope.commit_sha,
+        files: files.map(function(file) {
+          return {
+            path: file.path,
+            content: $scope.getModified(file)
+          };
+        }),
+        message: $scope.commit_message
+      }).success(function() {
+        $scope.committing = false;
+        $scope.commit_message = '';
+        FileCacheService.deleteOriginalAndModified($scope.repo_name, $scope.repo_branch);
+        RepoFilesCache.removeAll();
+        $window.history.back();
+      }).error(function() {
+        $scope.committing = false;
+        $window.alert('Commit failed');
+      });
     };
   }
 ]);
@@ -297,13 +326,19 @@ angular.module('MainModule').factory('Repos', ['$resource',
   }
 ]);
 
-angular.module('MainModule').factory('RepoFiles', ['$resource',
-  function($resource) {
+angular.module('MainModule').factory('RepoFilesCache', ['$cacheFactory',
+  function($cacheFactory) {
+    return $cacheFactory('RepoFilesCache');
+  }
+]);
+
+angular.module('MainModule').factory('RepoFiles', ['$resource', 'RepoFilesCache',
+  function($resource, RepoFilesCache) {
     return $resource('./api/repo/files', {}, {
       query: {
         method: 'GET',
         isArray: false,
-        cache: true
+        cache: RepoFilesCache
       }
     });
   }
@@ -320,43 +355,54 @@ angular.module('MainModule').factory('RepoFileBlob', ['$resource',
   }
 ]);
 
-angular.module('MainModule').factory('FileCacheService', [function() {
-  var cacheOriginal = {};
-  var cacheModified = {};
-  return {
-    setOriginal: function(repo, branch, path, content) {
-      var key = repo + ':' + branch + ':' + path;
-      cacheOriginal[key] = content;
-    },
-    setModified: function(repo, branch, path, content) {
-      var key = repo + ':' + branch + ':' + path;
-      if (cacheOriginal[key] === content) {
+angular.module('MainModule').factory('FileCacheService', [
+  function() {
+    var cacheOriginal = {};
+    var cacheModified = {};
+    return {
+      setOriginal: function(repo, branch, path, content) {
+        var key = repo + ':' + branch + ':' + path;
+        cacheOriginal[key] = content;
+      },
+      setModified: function(repo, branch, path, content) {
+        var key = repo + ':' + branch + ':' + path;
+        if (cacheOriginal[key] === content) {
+          delete cacheModified[key];
+        } else {
+          cacheModified[key] = content;
+        }
+      },
+      deleteModified: function(repo, branch, path) {
+        var key = repo + ':' + branch + ':' + path;
         delete cacheModified[key];
-      } else {
-        cacheModified[key] = content;
+      },
+      getOriginal: function(repo, branch, path) {
+        var key = repo + ':' + branch + ':' + path;
+        return cacheOriginal[key] || false;
+      },
+      get: function(repo, branch, path) {
+        var key = repo + ':' + branch + ':' + path;
+        return cacheModified[key] || cacheOriginal[key] || false;
+      },
+      isModified: function(repo, branch, path) {
+        var key = repo + ':' + branch + ':' + path;
+        return !!cacheModified[key];
+      },
+      deleteOriginalAndModified: function(repo, branch) {
+        var keyPrefix = repo + ':' + branch + ':';
+        Object.keys(cacheOriginal).forEach(function(key) {
+          if (key.lastIndexOf(keyPrefix, 0) === 0) {
+            delete cacheOriginal[key];
+            delete cacheModified[key];
+          }
+        });
       }
-    },
-    deleteModified: function(repo, branch, path) {
-      var key = repo + ':' + branch + ':' + path;
-      delete cacheModified[key];
-    },
-    getOriginal: function(repo, branch, path) {
-      var key = repo + ':' + branch + ':' + path;
-      return cacheOriginal[key] || false;
-    },
-    get: function(repo, branch, path) {
-      var key = repo + ':' + branch + ':' + path;
-      return cacheModified[key] || cacheOriginal[key] || false;
-    },
-    isModified: function(repo, branch, path) {
-      var key = repo + ':' + branch + ':' + path;
-      return !!cacheModified[key];
-    }
-  };
-}
+    };
+  }
 ]);
 
 angular.module('MainModule').directive('myDiff', [
+
   function() {
     return {
       restrict: 'AE',
@@ -365,7 +411,7 @@ angular.module('MainModule').directive('myDiff', [
         oldContent: '@',
         newContent: '@'
       },
-      link: function(scope, element /*, attrs*/) {
+      link: function(scope, element /*, attrs*/ ) {
         var udiff = difflib.unifiedDiff(scope.oldContent.split('\n'), scope.newContent.split('\n'), {
           lineterm: ''
         });

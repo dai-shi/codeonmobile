@@ -1,12 +1,18 @@
 .topbar CodeOnMobile > {{repo_name}} > Diff
 .container(ng-hide="profile.login")
   a(href="./auth/github") Sign in with GitHub
-.container(ng-show="profile.login")
-  .header-area
-    img.avatar.pull-right(ng-src="{{profile.avatar_url}}")
-    p.name.pull-right {{profile.name}}
-    h3.pull-left Diff
-  .clearfix
-  alert(ng-hide="repo_files", type="info") Loading...
-.diff-item(ng-repeat="file in repo_files | filter:{type:'blob'} | filter:checkModified")
-  my-diff(path="{{file.path}}", old-content="{{getOriginal(file)}}", new-content="{{getModified(file)}}")
+div(ng-show="profile.login")
+  .container
+    .header-area
+      img.avatar.pull-right(ng-src="{{profile.avatar_url}}")
+      p.name.pull-right {{profile.name}}
+      h3.pull-left Diff
+    .clearfix
+    alert(ng-hide="repo_files", type="info") Loading...
+  .diff-item(ng-repeat="file in repo_files | filter:checkModified")
+    my-diff(path="{{file.path}}", old-content="{{getOriginal(file)}}", new-content="{{getModified(file)}}")
+  .container
+    form.form
+      .form-group
+        textarea.form-control(placeholder="Input commit message...", ng-model="commit_message")
+      button.btn.btn-primary.pull-right(ng-disabled="!commit_message || committing", ng-click="doCommit()") {{committing ? 'Committing...' : 'Commit'}}

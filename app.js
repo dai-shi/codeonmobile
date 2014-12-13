@@ -24,6 +24,10 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+/* jshint undef: true, unused: true, latedef: true */
+/* jshint quotmark: single, eqeqeq: true */
+/* jshint node: true */
+
 var path = require('path');
 var http = require('http');
 var express = require('express');
@@ -47,6 +51,7 @@ passport.deserializeUser(function(obj, done) {
 passport.use(new GitHubStrategy({
     clientID: process.env.GITHUB_CLIENT_ID,
     clientSecret: process.env.GITHUB_CLIENT_SECRET,
+    scope: 'repo',
     callbackURL: process.env.BASE_URL + '/auth/github/callback'
   },
   function(accessToken, refreshToken, profile, done) {
@@ -63,9 +68,9 @@ passport.use(new GitHubStrategy({
 function getGitHubUserClient(req_user) {
   var token = req_user.accessToken;
   var github = new GitHubApi({
-    version: "3.0.0",
+    version: '3.0.0',
     headers: {
-      "user-agent": "CodeOnMobile"
+      'user-agent': 'CodeOnMobile'
     }
   });
   github.authenticate({
@@ -154,11 +159,11 @@ app.get('/api/repo/files', function(req, res) {
       res.sendStatus(500);
       return;
     }
-    var branch_sha = result.object.sha;
+    var commit_sha = result.object.sha;
     github.gitdata.getTree({
       user: req.user.profile.username,
       repo: req.query.repo_name,
-      sha: branch_sha,
+      sha: commit_sha,
       recursive: true
     }, function(err, result) {
       if (err) {
@@ -198,6 +203,26 @@ app.post('/api/commit', function(req, res) {
     res.json(false);
     return;
   }
+  if (!req.body.repo_name) {
+    res.status(500).send('no repo_name specified');
+    return;
+  }
+  if (!req.body.repo_branch) {
+    res.status(500).send('no repo_branch specified');
+    return;
+  }
+  if (!req.body.parent_sha) {
+    res.status(500).send('no parent_sha specified');
+    return;
+  }
+  if (!req.body.message) {
+    res.status(500).send('no message specified');
+    return;
+  }
+  if (!req.body.files || req.body.files.length < 1) {
+    res.status(500).send('no files specified');
+    return;
+  }
   var github = getGitHubUserClient(req.user);
   async.waterfall([
 
@@ -209,11 +234,12 @@ app.post('/api/commit', function(req, res) {
       }, cb);
     },
     function(result, cb) {
-      var branch_sha = result.object.sha;
-      if (branch_sha !== req.body.parent_sha) {
+      var commit_sha = result.object.sha;
+      if (commit_sha !== req.body.parent_sha) {
         cb('commit proceeds from the previous state');
         return;
       }
+      var tree_sha = commit_sha;
       var tree = req.body.files.map(function(file) {
         return {
           path: file.path,
@@ -226,12 +252,12 @@ app.post('/api/commit', function(req, res) {
         user: req.user.profile.username,
         repo: req.body.repo_name,
         tree: tree,
-        base_tree: req.body.parent_sha
+        base_tree: tree_sha
       }, cb);
     },
     function(result, cb) {
       var new_sha = result.sha;
-      github.gitdata.createTree({
+      github.gitdata.createCommit({
         user: req.user.profile.username,
         repo: req.body.repo_name,
         message: req.body.message,
