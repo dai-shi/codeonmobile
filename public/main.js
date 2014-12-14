@@ -355,10 +355,16 @@ angular.module('MainModule').factory('RepoFileBlob', ['$resource',
   }
 ]);
 
-angular.module('MainModule').factory('FileCacheService', [
-  function() {
+angular.module('MainModule').factory('RemoteFileCache', ['$resource',
+  function($resource) {
+    return $resource('./api/cache/files');
+  }
+]);
+
+angular.module('MainModule').factory('FileCacheService', ['RemoteFileCache',
+  function(RemoteFileCache) {
     var cacheOriginal = {};
-    var cacheModified = {};
+    var cacheModified = RemoteFileCache.get();
     return {
       setOriginal: function(repo, branch, path, content) {
         var key = repo + ':' + branch + ':' + path;
@@ -368,13 +374,16 @@ angular.module('MainModule').factory('FileCacheService', [
         var key = repo + ':' + branch + ':' + path;
         if (cacheOriginal[key] === content) {
           delete cacheModified[key];
-        } else {
+          RemoteFileCache.delete({key: key});
+        } else if (cacheModified[key] !== content) {
           cacheModified[key] = content;
+          RemoteFileCache.save({key: key, content: content});
         }
       },
       deleteModified: function(repo, branch, path) {
         var key = repo + ':' + branch + ':' + path;
         delete cacheModified[key];
+        RemoteFileCache.delete({key: key});
       },
       getOriginal: function(repo, branch, path) {
         var key = repo + ':' + branch + ':' + path;
@@ -394,6 +403,7 @@ angular.module('MainModule').factory('FileCacheService', [
           if (key.lastIndexOf(keyPrefix, 0) === 0) {
             delete cacheOriginal[key];
             delete cacheModified[key];
+            RemoteFileCache.delete({key: key});
           }
         });
       }

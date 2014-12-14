@@ -285,6 +285,50 @@ app.post('/api/commit', function(req, res) {
   });
 });
 
+app.get('/api/cache/files', function(req, res) {
+  if (!req.user) {
+    res.json([]);
+    return;
+  }
+  res.json(req.user.cache_files || {});
+});
+
+app.post('/api/cache/files', function(req, res) {
+  if (!req.user) {
+    res.json(false);
+    return;
+  }
+  if (!req.body.key) {
+    res.status(500).send('no key specified');
+    return;
+  }
+  if (!req.body.content) {
+    res.status(500).send('no content specified');
+    return;
+  }
+  if (!req.user.cache_files) {
+    req.user.cache_files = {};
+  }
+  req.user.cache_files[req.body.key] = req.body.content;
+  res.json(true);
+});
+
+app.delete('/api/cache/files', function(req, res) {
+  if (!req.user) {
+    res.json(false);
+    return;
+  }
+  if (!req.query.key) {
+    res.status(500).send('no key specified');
+    return;
+  }
+  if (!req.user.cache_files) {
+    req.json(false);
+    return;
+  }
+  delete req.user.cache_files[req.query.key];
+  res.json(true);
+});
 
 app.get(new RegExp('^/static/(.+)\\.html$'), function(req, res) {
   var view_name = req.params[0];
