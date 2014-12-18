@@ -323,7 +323,7 @@ app.delete('/api/cache/files', function(req, res) {
     return;
   }
   if (!req.user.cache_files) {
-    req.json(false);
+    res.json(false);
     return;
   }
   delete req.user.cache_files[req.query.key];
