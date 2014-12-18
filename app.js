@@ -33,7 +33,7 @@ var http = require('http');
 var express = require('express');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var express_session = require('express-session');
+var expressSession = require('express-session');
 var socket_io = require('socket.io');
 var passport = require('passport');
 var GitHubStrategy = require('passport-github').Strategy;
@@ -85,8 +85,12 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.use(cookieParser());
 app.use(bodyParser.json());
-app.use(express_session({
-  secret: process.env.SESSION_SECRET || 'secret-749845378925947473418910'
+app.use(expressSession({
+  store: process.env.DATABASE_URL && new(require('connect-pg-simple')(expressSession))(),
+  secret: process.env.SESSION_SECRET || 'secret-749845378925947473418910',
+  cookie: {
+    maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+  }
 }));
 app.use(passport.initialize());
 app.use(passport.session());
