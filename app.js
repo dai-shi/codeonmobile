@@ -108,6 +108,11 @@ app.get('/auth/github/callback',
     failureRedirect: '/'
   }));
 
+app.get('/logout', function(req, res) {
+  req.logout();
+  res.redirect('/');
+});
+
 app.get('/api/profile', function(req, res) {
   if (!req.user) {
     res.json({});

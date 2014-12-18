@@ -1,12 +1,9 @@
 .topbar CodeOnMobile
 .container(ng-hide="profile.login")
-  a(href="./auth/github") Sign in with GitHub
+  include login
 .container(ng-show="profile.login")
-  .header-area
-    img.avatar.pull-right(ng-src="{{profile.avatar_url}}")
-    p.name.pull-right {{profile.name}}
-    h3.pull-left Repos
-  .clearfix
+  - var headerText = 'Repos'
+  include header
   alert(ng-hide="repos", type="info") Loading...
   .list-group
     a.list-group-item(ng-repeat="repo in repos", href="#/repo?name={{repo.name}}&branch={{repo.default_branch}}") {{repo.name}}

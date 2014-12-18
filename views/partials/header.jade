@@ -1,0 +1,10 @@
+.header-area
+  img.avatar.pull-right(ng-src="{{profile.avatar_url}}")
+  .dropdown.pull-right(dropdown)
+    a.dropdown-toggle(dropdown-toggle)
+      | {{profile.name}}
+      span.caret
+    ul.dropdown-menu
+      li: a(ng-click="logout()") Sign out
+  h3.pull-left= headerText
+.clearfix
