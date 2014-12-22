@@ -231,6 +231,7 @@ angular.module('MainModule').controller('EditCtrl', function($scope, Profile, $l
       $scope.aceEditor = editor;
       var aceTA = $window.document.getElementsByClassName('ace_text-input')[0];
       aceTA.setAttribute('autocorrect', 'off');
+      $scope.aceEditor.getSession().setTabSize(2);
       $scope.aceEditor.getSession().selection.on('changeCursor', function() {
         $scope.cursorTop = $scope.aceEditor.renderer.$cursorLayer.getPixelPosition().top + 'px';
       });
