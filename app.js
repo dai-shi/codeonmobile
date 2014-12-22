@@ -164,7 +164,7 @@ app.get('/api/repo/files', function(req, res) {
     ref: 'heads/' + req.query.repo_branch
   }, function(err, result) {
     if (err) {
-      console.log('error in github.gitdata.getReference', err);
+      console.log('error in github.gitdata.getReference', err, req.query);
       res.sendStatus(500);
       return;
     }
@@ -348,7 +348,7 @@ app.use('/static', express.static(path.join(__dirname, 'public')));
 
 var server = http.createServer(app);
 var sio = socket_io(server);
-server.listen(process.env.OPENSHIFT_NODEJS_PORT || process.env.PORT || 5000, process.env.OPENSHIFT_NODEJS_IP, function() {
+server.listen(process.env.OPENSHIFT_NODEJS_PORT || process.env.PORT || 3000, process.env.OPENSHIFT_NODEJS_IP, function() {
   console.log('Express server listening.');
 });
 

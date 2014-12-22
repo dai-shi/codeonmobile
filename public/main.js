@@ -162,10 +162,10 @@ angular.module('MainModule').controller('DiffCtrl', function($scope, Profile, $l
       }),
       message: $scope.commit_message
     }).success(function() {
-      $scope.committing = false;
       $scope.commit_message = '';
       FileCacheService.deleteOriginalAndModified($scope.repo_name, $scope.repo_branch);
       RepoFilesCache.removeAll();
+      $scope.committing = false;
       $window.history.back();
     }).error(function() {
       $scope.committing = false;
@@ -339,41 +339,50 @@ angular.module('MainModule').factory('RemoteFileCache', function($resource) {
   return $resource('./api/cache/files');
 });
 
-angular.module('MainModule').factory('FileCacheService', function(RemoteFileCache) {
+angular.module('MainModule').factory('FileCacheService', function(RemoteFileCache, RepoFiles, RepoFileBlob, $window) {
   var cacheOriginal = {};
-  var cacheModified = RemoteFileCache.get(function(){
-      for (key in cacheModified) {
-          fetchOriginal(key);
-      }
+  var cacheModified = RemoteFileCache.get(function() {
+    Object.keys(cacheModified).forEach(function(key) {
+      if (key.lastIndexOf('$', 0) === 0) return;
+      fetchOriginal(key);
+    });
   });
 
   function fetchOriginal(key) {
-      var splited = key.split(':');
-      var repo = splited[0];
-      var branch = splited[1];
-      var path = splited[2];
-     RepoFiles.query({
-         repo_name: repo,
-         repo_branch: branch
-     }, function (data) {
-         var files = data.tree;
-         for (var i = 0; i < files.length; i++) {
-             var file = files[0];
-             if (file.path === path) {
-                 RepoFileBlob.get({
-                     repo_name: repo,
-                     file_sha: file.sha
-                 }, function (data){
-                     var content = data.content;
-                     //TODO decode base64
-                     cacheOriginal[key] = content;
-                     if (cacheModified[key] === content) {
-                         delete cacheModified[key];
-                     }
-                 });
-             }
-         }
-     });
+    var splited = key.split(':');
+    var repo = splited[0];
+    var branch = splited[1];
+    var path = splited[2];
+    RepoFiles.query({
+      repo_name: repo,
+      repo_branch: branch
+    }, function(data) {
+      var files = data.tree;
+      files.forEach(function(file) {
+        if (file.path === path) {
+          RepoFileBlob.get({
+            repo_name: repo,
+            file_sha: file.sha
+          }, function(data) {
+            var content = data.content;
+            if (data.encoding === 'base64') {
+              try {
+                content = B64.decode(data.content.replace(/\s/g, ''));
+              } catch (e) {
+                $window.alert('base64 decode error: ' + e);
+              }
+            }
+            cacheOriginal[key] = content;
+            if (cacheModified[key] === content) {
+              delete cacheModified[key];
+              RemoteFileCache.delete({
+                key: key
+              });
+            }
+          });
+        }
+      });
+    });
   }
   return {
     setOriginal: function(repo, branch, path, content) {

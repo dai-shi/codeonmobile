@@ -11,5 +11,5 @@ div(ng-show="profile.login")
   .container
     form.form
       .form-group
-        textarea.form-control(placeholder="Input commit message...", ng-model="commit_message")
+        textarea.form-control(placeholder="Input commit message...", ng-model="commit_message", ng-readonly="committing")
       button.btn.btn-primary.pull-right(ng-disabled="!commit_message || committing", ng-click="doCommit()") {{committing ? 'Committing...' : 'Commit'}}
