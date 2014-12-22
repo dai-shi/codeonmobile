@@ -341,8 +341,40 @@ angular.module('MainModule').factory('RemoteFileCache', function($resource) {
 
 angular.module('MainModule').factory('FileCacheService', function(RemoteFileCache) {
   var cacheOriginal = {};
-  var cacheModified = RemoteFileCache.get();
-  //TODO get original if cache exists
+  var cacheModified = RemoteFileCache.get(function(){
+      for (key in cacheModified) {
+          fetchOriginal(key);
+      }
+  });
+
+  function fetchOriginal(key) {
+      var splited = key.split(':');
+      var repo = splited[0];
+      var branch = splited[1];
+      var path = splited[2];
+     RepoFiles.query({
+         repo_name: repo,
+         repo_branch: branch
+     }, function (data) {
+         var files = data.tree;
+         for (var i = 0; i < files.length; i++) {
+             var file = files[0];
+             if (file.path === path) {
+                 RepoFileBlob.get({
+                     repo_name: repo,
+                     file_sha: file.sha
+                 }, function (data){
+                     var content = data.content;
+                     //TODO decode base64
+                     cacheOriginal[key] = content;
+                     if (cacheModified[key] === content) {
+                         delete cacheModified[key];
+                     }
+                 });
+             }
+         }
+     });
+  }
   return {
     setOriginal: function(repo, branch, path, content) {
       var key = repo + ':' + branch + ':' + path;
