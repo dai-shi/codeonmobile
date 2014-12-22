@@ -186,13 +186,6 @@ angular.module('MainModule').controller('EditCtrl', function($scope, Profile, $l
     file_sha: $scope.file_sha
   }, function(data) {
     var content = data.content;
-    if (data.encoding === 'base64') {
-      try {
-        content = B64.decode(data.content.replace(/\s/g, ''));
-      } catch (e) {
-        $window.alert('base64 decode error: ' + e);
-      }
-    }
     FileCacheService.setOriginal($scope.repo_name, $scope.repo_branch, $scope.file_path, content);
     $scope.content = FileCacheService.get($scope.repo_name, $scope.repo_branch, $scope.file_path);
     $timeout(updateEditorHeight, 10);
@@ -327,11 +320,25 @@ angular.module('MainModule').factory('RepoFiles', function($resource, RepoFilesC
   });
 });
 
-angular.module('MainModule').factory('RepoFileBlob', function($resource) {
+angular.module('MainModule').factory('RepoFileBlob', function($resource, $window) {
   return $resource('./api/repo/file/blob', {}, {
     get: {
       method: 'GET',
-      cache: true
+      cache: true,
+      transformResponse: [
+        angular.fromJson,
+        function(data) {
+          if (data.encoding === 'base64') {
+            try {
+              data.content = B64.decode(data.content.replace(/\s/g, ''));
+              data.encoding = null;
+            } catch (e) {
+              $window.alert('base64 decode error: ' + e);
+            }
+          }
+          return data;
+        }
+      ]
     }
   });
 });
@@ -340,7 +347,7 @@ angular.module('MainModule').factory('RemoteFileCache', function($resource) {
   return $resource('./api/cache/files');
 });
 
-angular.module('MainModule').factory('FileCacheService', function(RemoteFileCache, RepoFiles, RepoFileBlob, $window) {
+angular.module('MainModule').factory('FileCacheService', function(RemoteFileCache, RepoFiles, RepoFileBlob) {
   var cacheOriginal = {};
   var cacheModified = RemoteFileCache.get(function() {
     Object.keys(cacheModified).forEach(function(key) {
@@ -366,13 +373,6 @@ angular.module('MainModule').factory('FileCacheService', function(RemoteFileCach
             file_sha: file.sha
           }, function(data) {
             var content = data.content;
-            if (data.encoding === 'base64') {
-              try {
-                content = B64.decode(data.content.replace(/\s/g, ''));
-              } catch (e) {
-                $window.alert('base64 decode error: ' + e);
-              }
-            }
             cacheOriginal[key] = content;
             if (cacheModified[key] === content) {
               delete cacheModified[key];
