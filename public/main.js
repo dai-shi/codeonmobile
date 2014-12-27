@@ -80,6 +80,8 @@ angular.module('MainModule').run(function($rootScope, $window, $location) {
     $window.location.href = './logout';
   };
 
+  $rootScope.clipboard = {};
+
   angular.element($window).bind('scroll', function() {
     $rootScope.$broadcast('scroll');
   });
@@ -248,6 +250,7 @@ angular.module('MainModule').controller('EditCtrl', function($scope, Profile, $l
   });
   angular.element(textareaEle).on('keydown', function(event) {
     //console.log(event.keyCode);
+    var session = $scope.aceEditor.getSession();
     switch (event.keyCode) {
       case 72:
         $scope.aceEditor.navigateLeft();
@@ -263,18 +266,37 @@ angular.module('MainModule').controller('EditCtrl', function($scope, Profile, $l
       case 76:
         $scope.aceEditor.navigateRight();
         break;
+      case 83:
+        $scope.aceEditor.navigateLineStart();
+        break;
+      case 69:
+        $scope.aceEditor.navigateLineEnd();
+        break;
       case 85:
         $scope.aceEditor.undo();
         break;
       case 82:
         $scope.aceEditor.redo();
         break;
+      case 66:
+        session.selection.selectUp();
+        break;
+      case 70:
+        session.selection.selectDown();
+        break;
       case 88:
-        var session = $scope.aceEditor.getSession();
-        var selection = session.selection;
-        selection.selectRight();
-        session.remove(selection.getRange());
-        selection.clearSelection();
+        session.selection.selectRight();
+        session.remove(session.selection.getRange());
+        session.selection.clearSelection();
+        break;
+      case 89:
+        $scope.clipboard['default'] = $scope.aceEditor.getCopyText();
+        break;
+      case 68:
+        session.remove($scope.aceEditor.getSelectionRange());
+        break;
+      case 80:
+        $scope.aceEditor.insert($scope.clipboard['default'] || '');
         break;
       case 81:
         $scope.aceEditor.focus();
