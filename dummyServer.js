@@ -61,12 +61,14 @@ function dummyServer(req, res, fetchFile) {
       if (err) return res.status(404).send('no such file');
       processJadeInclude(match[1].replace(/[^\/]*$/, ''), content, function(err, content) {
         if (err) return res.status(500).send('jade error');
+        res.type('html');
         res.send(renderJade(content));
       });
     });
   } else {
     fetchFile('public/' + req.url.replace(/^\/static\//, ''), function(err, content) {
       if (err) return res.status(404).send('no such file');
+      res.type(req.url.match(/\.(\w+)$/)[1]);
       res.send(content);
     });
   }
