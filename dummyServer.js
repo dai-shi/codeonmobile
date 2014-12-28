@@ -1,4 +1,11 @@
+var dummy_socket_io_client = 'io={connect:function(){return{on:function(){}}}};';
+
+
 function dummyServer(req, res, fetchFile) {
+  if (req.url === '/socket.io/socket.io.js') {
+    res.send(dummy_socket_io_client);
+    return;
+  }
   var match = req.url.match(/^\/static\/(.+)\.html$/);
   if (req.url === '/') {
     match = [null, 'index'];
