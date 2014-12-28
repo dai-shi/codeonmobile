@@ -369,6 +369,7 @@ function getFetchFile(req_user, target_repo, target_branch) {
   var github = getGitHubUserClient(req_user);
   //TODO caching
   return function(target_path, callback) {
+    if (!callback) return console.log('fetchFile fatal error: no callback');
     var key = target_repo + ':' + target_branch + ':' + target_path;
     if (req_user.cache_files && req_user.cache_files[key]) {
       callback(null, req_user.cache_files[key]);
