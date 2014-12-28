@@ -13,8 +13,11 @@ function dummyServer(req, res, fetchFile) {
   };
   if (req.url.match(/\.html$/)) {
     fetchFile('views' + req.url.replace(/\.html$/, '.jade'), function(err, content) {
-      if (err) return fetchPublic();
-      res.send(renderJade(content));
+      if (err) {
+        fetchPublic();
+      } else {
+        res.send(renderJade(content));
+      }
     });
   } else {
     fetchPublic();
