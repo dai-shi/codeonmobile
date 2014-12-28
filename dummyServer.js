@@ -24,7 +24,15 @@ function dummyServer(req, res, fetchFile) {
   }
 
   function processApi(req, res) {
-    res.status(500).send();
+    if (req.url === '/api/profile') {
+      res.json({
+        login: 'dai-shi',
+        name: 'Daishi Kato',
+        'avatar_url': 'https://avatars.githubusercontent.com/u/490574?v=3'
+      });
+    } else {
+      res.status(500).send();
+    }
   }
 
   var dummy_socket_io_client = 'io={connect:function(){return{on:function(){}}}};';
