@@ -30,6 +30,14 @@ function dummyServer(req, res, fetchFile) {
         name: 'Daishi Kato',
         'avatar_url': 'https://avatars.githubusercontent.com/u/490574?v=3'
       });
+    } else if (req.url === '/api/repos') {
+      res.json([{
+        name: 'codeonmobile',
+        'default_branch': 'master'
+      }, {
+        name: 'TestForCodeOnMobile',
+        'default_branch': 'master'
+      }]);
     } else {
       res.status(500).send();
     }
