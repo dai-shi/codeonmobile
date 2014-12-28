@@ -17,6 +17,6 @@ function dummyServer(req, res, fetchFile) {
       res.send(renderJade(content));
     });
   } else {
-    fetchFile();
+    fetchPublic();
   }
 }
