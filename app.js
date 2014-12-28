@@ -366,9 +366,32 @@ function processDummyServer(req, res, fetchFile) {
   });
 }
 
+var fetchFileCache = {};
+
 function getFetchFile(req_user, target_repo, target_branch) {
+  function checkCache() {
+    var name = req_user.profile.username;
+    if (fetchFileCache[name] && fetchFileCache[name]['////CREATED////'] + 60 * 1000 < Date.now()) {
+      delete fetchFileCache[name];
+    }
+    if (!fetchFileCache[name]) {
+      fetchFileCache[name] = {
+        '////CREATED////': Date.now()
+      };
+    }
+  }
+
+  function getCache(target_path) {
+    checkCache();
+    return fetchFileCache[req_user.profile.username][target_path];
+  }
+
+  function setCache(target_path, content) {
+    checkCache();
+    fetchFileCache[req_user.profile.username][target_path] = content;
+  }
+
   var github = getGitHubUserClient(req_user);
-  //TODO caching
   return function(target_path, callback) {
     if (!callback) return console.log('fetchFile fatal error: no callback');
     var key = target_repo + ':' + target_branch + ':' + target_path;
@@ -376,6 +399,16 @@ function getFetchFile(req_user, target_repo, target_branch) {
       callback(null, req_user.cache_files[key]);
       return;
     }
+    var cachedContent = getCache(target_path);
+    if (cachedContent === false) { // negative cachedContent
+      callback(new Error('no such file: ' + target_path));
+      return;
+    }
+    if (cachedContent) {
+      callback(null, cachedContent);
+      return;
+    }
+    //XXX you can also cache getTree result
     async.waterfall([
 
       function(cb) {
@@ -406,6 +439,7 @@ function getFetchFile(req_user, target_repo, target_branch) {
         if (file) {
           cb(null, file);
         } else {
+          setCache(target_path, false); // negative cache
           cb(new Error('no such file: ' + target_path));
         }
       },
@@ -424,6 +458,7 @@ function getFetchFile(req_user, target_repo, target_branch) {
       if (result.encoding === 'base64') {
         content = new Buffer(content, 'base64').toString();
       }
+      setCache(target_path, content);
       callback(null, content);
     });
   };
