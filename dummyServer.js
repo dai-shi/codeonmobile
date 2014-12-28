@@ -62,6 +62,7 @@ function dummyServer(req, res, fetchFile) {
       processJadeInclude(match[1].replace(/[^\/]*$/, ''), content, function(err, content) {
         if (err) return res.status(500).send('jade error');
         res.type('html');
+        console.log(content);
         res.send(renderJade(content));
       });
     });
