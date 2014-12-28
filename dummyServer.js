@@ -2,13 +2,10 @@ function dummyServer(req, res, fetchFile) {
 
   function processJadeInclude(base, jade, callback) {
     var match = jade.match(/\n( +)include (.+)\n/);
-    if (!match) {
-      callback(null, jade);
-      return;
-    }
+    if (!match) return callback(null, jade);
     var indent = match[1];
     var file = base + match[2];
-    fetchFile('views/' + file, function(err, content) {
+    fetchFile('views/' + file + '.jade', function(err, content) {
       if (err) return callback(err);
       processJadeInclude(file.replace(/[^\/]*$/, ''), content, function(err, content) {
         if (err) return callback(err);
@@ -31,19 +28,16 @@ function dummyServer(req, res, fetchFile) {
   }
   if (match) {
     fetchFile('views/' + match[1] + '.jade', function(err, content) {
-      if (err) {
-        res.status(404).send('no such file');
-      } else {
+      if (err) return res.status(404).send('no such file');
+      processJadeInclude(match[1].replace(/[^\/]*$/, ''), content, function(err, content) {
+        if (err) return res.status(500).send('jade error');
         res.send(renderJade(content));
-      }
+      });
     });
   } else {
     fetchFile('public/' + req.url.replace(/^\/static\//, ''), function(err, content) {
-      if (err) {
-        res.status(404).send('no such file');
-      } else {
-        res.send(content);
-      }
+      if (err) return res.status(404).send('no such file');
+      res.send(content);
     });
   }
 }
