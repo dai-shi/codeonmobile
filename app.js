@@ -39,6 +39,8 @@ var passport = require('passport');
 var GitHubStrategy = require('passport-github').Strategy;
 var GitHubApi = require('github');
 var async = require('async');
+var vm = require('vm');
+var makeSafeCode = require('./safeCode.js').makeSafeCode;
 
 passport.serializeUser(function(user, done) {
   done(null, user);
@@ -88,6 +90,8 @@ app.use(bodyParser.json());
 app.use(expressSession({
   store: process.env.DATABASE_URL && new(require('connect-pg-simple')(expressSession))(),
   secret: process.env.SESSION_SECRET || 'secret-749845378925947473418910',
+  resave: false,
+  saveUninitialized: true,
   cookie: {
     maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
   }
@@ -337,6 +341,94 @@ app.delete('/api/cache/files', function(req, res) {
   }
   delete req.user.cache_files[req.query.key];
   res.json(true);
+});
+
+function processDummyServer(req, res, fetchFile) {
+  fetchFile('dummyServer.js', function(err, content) {
+    if (err) {
+      // probably there is no such file.
+      res.status(404).send();
+      return;
+    }
+    var sandbox = {
+      req: req,
+      res: res,
+      fetchFile: fetchFile
+    };
+    var varname = 'counter' + Math.random().toString().substring(2);
+    sandbox[varname] = 0;
+    vm.runInNewContext('(' + makeSafeCode(content, varname) + ')(req, res, fetchFile);', sandbox);
+  });
+}
+
+function getFetchFile(req_user, target_repo, target_branch) {
+  var github = getGitHubUserClient(req_user);
+  //TODO caching
+  return function(target_path, callback) {
+    var key = target_repo + ':' + target_branch + ':' + target_path;
+    if (req_user.cache_files && req_user.cache_files[key]) {
+      callback(null, req_user.cache_files[key]);
+      return;
+    }
+    async.waterfall([
+
+      function(cb) {
+        github.gitdata.getReference({
+          user: req_user.profile.username,
+          repo: target_repo,
+          ref: 'heads/' + target_branch
+        }, cb);
+      },
+      function(result, cb) {
+        var commit_sha = result.object.sha;
+        github.gitdata.getTree({
+          user: req_user.profile.username,
+          repo: target_repo,
+          sha: commit_sha,
+          recursive: true
+        }, cb);
+      },
+      function(result, cb) {
+        var files = result.tree;
+        var file = null;
+        for (var i = 0; i < files.length; i++) {
+          if (files[i].type === 'blob' && files[i].path === target_path) {
+            file = files[i];
+            break;
+          }
+        }
+        if (file) {
+          cb(null, file);
+        } else {
+          cb(new Error('no such file: ' + target_path));
+        }
+      },
+      function(result, cb) {
+        var file_sha = result.sha;
+        github.gitdata.getBlob({
+          user: req_user.profile.username,
+          repo: target_repo,
+          sha: file_sha
+        }, cb);
+      }
+
+    ], function(err, result) {
+      if (err) return callback(err);
+      var content = result.content;
+      if (result.encoding === 'base64') {
+        content = new Buffer(content, 'base64').toString();
+      }
+      callback(null, content);
+    });
+  };
+}
+
+app.use('/dummy/:repo/:branch', function(req, res) {
+  if (!req.user) {
+    res.status(500).send('not logged in');
+    return;
+  }
+  processDummyServer(req, res, getFetchFile(req.user, req.params.repo, req.params.branch));
 });
 
 app.get(new RegExp('^/static/(.+)\\.html$'), function(req, res) {

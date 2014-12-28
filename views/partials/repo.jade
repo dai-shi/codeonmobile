@@ -13,4 +13,5 @@
         span.glyphicon.glyphicon-asterisk.small
       button.pull-right(ng-show="checkModified(file)", ng-click="deleteModified(file); $event.preventDefault()") Revert
   a.btn.btn-primary(ng-disabled="!checkAllModified()", href="#/diff?name={{repo_name}}&branch={{repo_branch}}") Show Diff
+  a.btn.btn-default.pull-right(href="/dummy/{{repo_name}}/{{repo_branch}}/", target="_blank") Run with Dummy Server
   p &nbsp;
