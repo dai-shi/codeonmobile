@@ -39,6 +39,7 @@ var passport = require('passport');
 var GitHubStrategy = require('passport-github').Strategy;
 var GitHubApi = require('github');
 var async = require('async');
+var jade = require('jade');
 var vm = require('vm');
 var makeSafeCode = require('./safeCode.js').makeSafeCode;
 
@@ -353,7 +354,10 @@ function processDummyServer(req, res, fetchFile) {
     var sandbox = {
       req: req,
       res: res,
-      fetchFile: fetchFile
+      fetchFile: fetchFile,
+      renderJade: function(str, opts) {
+        return jade.render(str, opts);
+      }
     };
     var varname = 'counter' + Math.random().toString().substring(2);
     sandbox[varname] = 0;
