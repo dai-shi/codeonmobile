@@ -1,25 +1,23 @@
 function dummyServer(req, res, fetchFile) {
+  var match = req.url.match(/^\/static\/(.+)\.html$/);
   if (req.url === '/') {
-    req.url = '/index.html';
+    match = [null, 'index'];
   }
-  var fetchPublic = function() {
-    fetchFile('public' + req.url, function(err, content) {
+  if (match) {
+    fetchFile('views/' + match[1] + '.jade', function(err, content) {
+      if (err) {
+        res.status(404).send('no such file');
+      } else {
+        res.send(renderJade(content));
+      }
+    });
+  } else {
+    fetchFile('public/' + req.url.replace(/^\/static\//, ''), function(err, content) {
       if (err) {
         res.status(404).send('no such file');
       } else {
         res.send(content);
       }
     });
-  };
-  if (req.url.match(/\.html$/)) {
-    fetchFile('views' + req.url.replace(/\.html$/, '.jade'), function(err, content) {
-      if (err) {
-        fetchPublic();
-      } else {
-        res.send(renderJade(content));
-      }
-    });
-  } else {
-    fetchPublic();
   }
 }
