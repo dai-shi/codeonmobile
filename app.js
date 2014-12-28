@@ -345,7 +345,6 @@ app.delete('/api/cache/files', function(req, res) {
 });
 
 function processDummyServer(req, res, fetchFile) {
-  console.log('DEBUG processDummyServer', req.url);
   fetchFile('dummyServer.js', function(err, content) {
     if (err) {
       // probably there is no such file.

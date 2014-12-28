@@ -23,9 +23,17 @@ function dummyServer(req, res, fetchFile) {
     });
   }
 
+  function processApi(req, res) {
+    res.status(500).send();
+  }
+
   var dummy_socket_io_client = 'io={connect:function(){return{on:function(){}}}};';
   if (req.url === '/socket.io/socket.io.js') {
     res.send(dummy_socket_io_client);
+    return;
+  }
+  if (req.url.match('/api/')) {
+    processApi(req, res);
     return;
   }
   var match = req.url.match(/^\/static\/(.+)\.html$/);
