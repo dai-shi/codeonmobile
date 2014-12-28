@@ -1,3 +1,9 @@
+/* jshint undef: true, unused: true, latedef: true */
+/* jshint quotmark: single, eqeqeq: true */
+/* jshint node: true */
+/* global renderJade */
+/* exported dummyServer */
+
 function dummyServer(req, res, fetchFile) {
 
   function processJadeInclude(base, jade, callback) {
@@ -10,7 +16,7 @@ function dummyServer(req, res, fetchFile) {
       processJadeInclude(file.replace(/[^\/]*$/, ''), content, function(err, content) {
         if (err) return callback(err);
         content = content.replace(/\n$/, '');
-        content = index + content.replace(/\n/, '\n' + indent) + '\n';
+        content = indent + content.replace(/\n/, '\n' + indent) + '\n';
         jade = jade.replace(/\n( +)include (.+)\n/, '\n' + content);
         processJadeInclude(base, jade, callback);
       });
