@@ -352,7 +352,6 @@ function processDummyServer(req, res, fetchFile) {
       return;
     }
     var sandbox = {
-      console: console, // for debug
       req: req,
       res: res,
       fetchFile: fetchFile,
