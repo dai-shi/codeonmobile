@@ -16,7 +16,7 @@ function dummyServer(req, res, fetchFile) {
       processJadeInclude(file.replace(/[^\/]*$/, ''), content, function(err, content) {
         if (err) return callback(err);
         content = content.slice(0, -1);
-        content = indent + content.replace(/\n/, '\n' + indent) + '\n';
+        content = indent + content.replace(/\n/g, '\n' + indent) + '\n';
         jade = jade.replace(/\n( +)include (.+)\n/, '\n' + content);
         processJadeInclude(base, jade, callback);
       });
