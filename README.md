@@ -34,6 +34,12 @@ Screencast
 Usage
 -----
 
+Please visit the following web site:
+
+<http://codeonmobile.axlight.com/>
+
+The followings are the typical steps to use this tool.
+
 1. Login using your GitHub account.
 2. Once you logged in, you will see the list of your repositories.
 3. If you select a repository, you will see a list of files in the repository.
