@@ -348,6 +348,7 @@ function processDummyServer(req, res, fetchFile) {
   fetchFile('dummyServer.js', function(err, content) {
     if (err) {
       // probably there is no such file.
+      console.log('error getting dummyServer.js', err);
       res.status(404).send();
       return;
     }
