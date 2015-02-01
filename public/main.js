@@ -474,6 +474,8 @@ angular.module('MainModule').directive('myDiff', function() {
         lineterm: ''
       });
       var udiffStr = 'diff --git a/' + scope.path + ' b/' + scope.path + '\n';
+      udiffStr += '--- a/' + scope.path + '\n';
+      udiffStr += '+++ b/' + scope.path + '\n';
       udiffStr += udiff.join('\n');
       element[0].innerHTML = Diff2Html.getPrettyHtmlFromDiff(udiffStr);
     }

@@ -32,11 +32,6 @@
   position: inherit;
 }
 
-.d2h-code-linenumber[colspan="2"] {
-  position: absolute;
-  z-index: -1;
-}
-
 .d2h-code-line {
   margin-left: 0;
 }
