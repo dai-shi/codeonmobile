@@ -1,0 +1,235 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>slides</title>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/reveal.js/2.6.2/css/reveal.min.css" />
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/reveal.js/2.6.2/css/theme/default.css" id="theme" />
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/reveal.js/2.6.2/lib/css/zenburn.css" />
+</head>
+<body>
+<div class="reveal">
+  <div class="slides">
+    <section data-markdown data-separator="^\n\n\n" data-vertical="^\n\n" data-notes="^Note:">
+      <script type="text/template">
+## CodeOnMobile
+@dai_shi
+
+
+
+## 自己紹介
+- @dai_shi
+- ブログ「SundayHacking」
+- https://github.com/dai-shi
+
+
+
+## 背景
+- あいつらは直列に繋いでやれば結構なポテンシャルを発揮するんだ by 滝沢朗
+
+![image](http://cdn-ak.f.st-hatena.com/images/fotolife/k/kenchi555/20091221/20091221221506.jpg)
+
+- 何でもスマホの時代、コーディングもスマホで
+- 電車の中でコーディングできたらいいんじゃないか
+- すきま時間の有効活用
+
+
+
+## iPhoneアプリを調べた
+- GitHubのクライアントがイメージに近い
+  - sshクライアントも参考になる
+- エディタがついていてリポジトリのファイルをいじれるものもある
+- しかし、エディタがtextarea相当でしょぼい
+- また、コミット前に動作確認できない
+- 自分で作ろう
+
+
+
+## 作ったもの
+- 「CodeOnMobile」
+- GitHubのコードをブラウザ上で編集するWebアプリ
+- iPhoneでの利用を想定(virtual keyboard対策)
+- 他のスマホやタブレットでも使える
+
+
+
+## 使ったライブラリ
+### サーバサイド
+```
+  "dependencies": {
+    "async": "0.9.0",
+    "body-parser": "1.5.2",
+    "connect-pg-simple": "2.1.1",
+    "cookie-parser": "1.3.2",
+    "escodegen": "1.4.3",
+    "esprima": "1.2.2",
+    "express": "4.10.4",
+    "express-session": "1.9.2",
+    "github": "0.2.3",
+    "jade": "1.5.0",
+    "passport": "0.2.1",
+    "passport-github": "0.1.5",
+    "underscore": "1.7.0"
+  },
+```
+
+
+
+## 使ったライブラリ
+### クライアントサイド
+- Angular
+- Bootstrap
+- ACE
+- diff2html
+
+
+
+## 何ができるか
+- GitHub連携してログイン
+- リポジトリのファイルを編集
+- diffを確認
+- dummyServerで動作確認
+  - Webアプリのクライアントサイドのみ
+- GitHubにコミット
+- CodeShipでHerokuにDeploy
+  - 設定すればテストも
+
+
+
+## 使用イメージ
+スクリーンショット↓
+
+
+![scn](//dai-shi.github.io/codeonmobile/screenshot/resize_00.png)
+
+
+![scn](//dai-shi.github.io/codeonmobile/screenshot/resize_01.png)
+
+
+![scn](//dai-shi.github.io/codeonmobile/screenshot/resize_02.png)
+
+
+![scn](//dai-shi.github.io/codeonmobile/screenshot/resize_03.png)
+
+
+![scn](//dai-shi.github.io/codeonmobile/screenshot/resize_04.png)
+
+
+![scn](//dai-shi.github.io/codeonmobile/screenshot/resize_05.png)
+
+
+![scn](//dai-shi.github.io/codeonmobile/screenshot/resize_06.png)
+
+
+![scn](//dai-shi.github.io/codeonmobile/screenshot/resize_07.png)
+
+
+![scn](//dai-shi.github.io/codeonmobile/screenshot/resize_08.png)
+
+
+![scn](//dai-shi.github.io/codeonmobile/screenshot/resize_09.png)
+
+
+![scn](//dai-shi.github.io/codeonmobile/screenshot/resize_10.png)
+
+
+![scn](//dai-shi.github.io/codeonmobile/screenshot/resize_11.png)
+
+
+![scn](//dai-shi.github.io/codeonmobile/screenshot/resize_12.png)
+
+
+![scn](//dai-shi.github.io/codeonmobile/screenshot/resize_13.png)
+
+
+![scn](//dai-shi.github.io/codeonmobile/screenshot/resize_14.png)
+
+
+![scn](//dai-shi.github.io/codeonmobile/screenshot/resize_15.png)
+
+
+![scn](//dai-shi.github.io/codeonmobile/screenshot/resize_16.png)
+
+
+![scn](//dai-shi.github.io/codeonmobile/screenshot/resize_17.png)
+
+
+![scn](//dai-shi.github.io/codeonmobile/screenshot/resize_18.png)
+
+
+![scn](//dai-shi.github.io/codeonmobile/screenshot/resize_19.png)
+
+
+![scn](//dai-shi.github.io/codeonmobile/screenshot/resize_20.png)
+
+
+![scn](//dai-shi.github.io/codeonmobile/screenshot/resize_21.png)
+
+
+![scn](//dai-shi.github.io/codeonmobile/screenshot/resize_22.png)
+
+
+![scn](//dai-shi.github.io/codeonmobile/screenshot/resize_23.png)
+
+
+![scn](//dai-shi.github.io/codeonmobile/screenshot/resize_24.png)
+
+
+![scn](//dai-shi.github.io/codeonmobile/screenshot/resize_25.png)
+
+
+![scn](//dai-shi.github.io/codeonmobile/screenshot/resize_26.png)
+
+
+![scn](//dai-shi.github.io/codeonmobile/screenshot/resize_27.png)
+
+
+![scn](//dai-shi.github.io/codeonmobile/screenshot/resize_28.png)
+
+
+
+## ちょっとがんばったところ
+- vmモジュールを作ってdummyServer.jsを動かしている
+- 新しいプロセスを立ち上げてはいない
+- Herokuでも動く
+
+
+
+## 今後
+- 少なくともJavaScriptの自動フォーマット機能は入れたい
+- GitHub以外も対応したいと思いつつ、大変そうなので後回し
+
+- サイトはこちら→　<http://codeonmobile.axlight.com/>
+
+
+
+## おしまい
+<div style="font-size: 60%; margin-top: 20em;">この作品は [クリエイティブ・コモンズ 表示 - 非営利 - 改変禁止 2.1 日本 ライセンス](http://creativecommons.org/licenses/by-nc-nd/2.1/jp/) の下に提供されています。</div>
+    </script>
+  </div>
+</div>
+
+<script src="//cdn.jsdelivr.net/reveal.js/2.6.2/lib/js/head.min.js"></script>
+<script src="//cdn.jsdelivr.net/reveal.js/2.6.2/js/reveal.min.js"></script>
+<script>
+  Reveal.initialize({
+    controls: false,
+    theme: 'blood',
+    transition: 'default',
+    dependencies: [
+      { src: '//cdn.jsdelivr.net/reveal.js/2.6.2/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+      { src: '//cdn.jsdelivr.net/reveal.js/2.6.2/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+      { src: '//cdn.jsdelivr.net/reveal.js/2.6.2/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+      { src: '//cdn.jsdelivr.net/reveal.js/2.6.2/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+      { src: '//cdn.jsdelivr.net/reveal.js/2.6.2/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+      { src: '//cdn.jsdelivr.net/reveal.js/2.6.2/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+    ]
+  });
+</script>
+
+<div style="display: block; position: absolute; bottom: 10px; right: 10px; z-index: 20;">
+  <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/2.1/jp/"><img alt="クリエイティブ・コモンズ・ライセンス" style="border-width:0" src="http://i.creativecommons.org/l/by-nc-nd/2.1/jp/88x31.png" /></a>
+</div>
+
+</body>
+</html>
