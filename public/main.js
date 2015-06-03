@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2014, Daishi Kato <daishi@axlight.com>
+  Copyright (C) 2014-2015, Daishi Kato <daishi@axlight.com>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -25,10 +25,13 @@
 */
 
 /* jshint undef: true, unused: true, latedef: true */
-/* jshint quotmark: single, eqeqeq: true */
+/* jshint quotmark: single, eqeqeq: true, globalstrict: true */
 
 /* global angular, io, B64 */
 /* global difflib, Diff2Html */
+/* global js_beautify */
+
+'use strict';
 
 angular.module('MainModule', ['ngRoute', 'ngResource', 'ngTouch', 'ngSanitize', 'ui.ace', 'ui.bootstrap']);
 
@@ -300,6 +303,13 @@ angular.module('MainModule').controller('EditCtrl', function($scope, Profile, $l
         break;
       case 81:
         $scope.aceEditor.focus();
+        break;
+      case 87:
+        var newContent = js_beautify($scope.content, {
+          indent_size: 2
+        });
+        session.selection.selectAll();
+        $scope.aceEditor.insert(newContent);
         break;
     }
     event.preventDefault();
