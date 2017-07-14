@@ -24,6 +24,6 @@
   },
   "license": "BSD",
   "engines": {
-    "node": "0.10.38"
+    "node": "^4.8.4"
   }
 }
